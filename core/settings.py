@@ -1,31 +1,20 @@
+import os
 from pathlib import Path
+from .env import env
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+SECRET_KEY = env('SECRET_KEY')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x7#$7asp6u4)7#6#n2bc6%)_anr)lp!xt2v^v45f(w^-%l7=n8'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
 
-# Application definition
-
 INSTALLED_APPS = [
-    'carts.apps.CartConfig',
-    'customer_addresses.apps.CustomerAddressesConfig',
-    'customers.apps.CustomersConfig',
-    'dashboard.apps.ShopConfig',
-    'payments.apps.PaymentsConfig',
-    'product_reviews.apps.ProductReviewsConfig',
-    'products.apps.ProductsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,6 +22,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+INSTALLED_EXTENSIONS = [
+    'carts.apps.CartConfig',
+    'customer_addresses.apps.CustomerAddressesConfig',
+    'customers.apps.CustomersConfig',
+    'dashboard.apps.ShopConfig',
+    'payments.apps.PaymentsConfig',
+    'product_reviews.apps.ProductReviewsConfig',
+    'products.apps.ProductsConfig'
+]
+
+
+INSTALLED_APPS += INSTALLED_EXTENSIONS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,11 +73,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'NAME': env('DB_USER'),
+        'USER': env('DB_NAME'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT')
     }
 }
 
