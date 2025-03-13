@@ -225,7 +225,12 @@
 										</div>
 									</div>
 									<div class="add-to-cart">
-										<button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+										<form action="{% url "product-add" %}" method="POST">
+											{% csrf_token %}
+											<input type="hidden" name="product_id" value="{{ product.id }}">
+
+											<button class="add-to-cart-btn" type="submit"><i class="fa fa-shopping-cart"></i> add to cart</button>
+										</form>
 									</div>
 								</div>
 							</div>
@@ -238,14 +243,22 @@
 
 						<!-- store bottom filter -->
 						<div class="store-filter clearfix">
-							<span class="store-qty">Showing 20-100 products</span>
+							<span class="store-qty">Showing {{ page_obj.start_index }} - {{ page_obj.end_index }} products</span>
+							{% if page_obj.has_other_pages %}
 							<ul class="store-pagination">
-								<li class="active">1</li>
-								<li><a href="#">2</a></li>
-								<li><a href="#">3</a></li>
-								<li><a href="#">4</a></li>
-								<li><a href="#"><i class="fa fa-angle-right"></i></a></li>
+								{% if page_obj.has_previous %}
+								<li><a href="?page={{ page_obj.previous_page_number }}"><i class="fa fa-angle-left"></i></a></li>
+								<li><a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+								{% endif %}
+
+								<li class="active">{{ page_obj.number }}</li>
+
+								{% if page_obj.has_next %}
+								<li><a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+								<li><a href="?page={{ page_obj.next_page_number }}"><i class="fa fa-angle-right"></i></a></li>
+								{% endif %}
 							</ul>
+							{% endif %}
 						</div>
 						<!-- /store bottom filter -->
 					</div>
