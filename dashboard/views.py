@@ -3,6 +3,8 @@ from django.views.generic import TemplateView
 from django.views.generic.list import ListView
 from products.models import Category
 
+from carts.cart import Cart
+
 
 #def home(request):
 #    return render(request, 'dashboard/home.html',
@@ -19,4 +21,5 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["categories"] = Category.objects.all().order_by("name").values()
         context["category_display"] = Category.objects.all().order_by("name")[:3]
+        context["cart"] = Cart(self.request)
         return context
