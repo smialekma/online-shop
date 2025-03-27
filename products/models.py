@@ -3,6 +3,13 @@ from django.utils import timezone
 from PIL import Image
 
 
+class Brand(models.Model):
+    name = models.CharField()
+
+    def __str__(self):
+        return self.name
+
+
 class Category(models.Model):
     name = models.CharField()
     photo = models.ImageField(upload_to="category_pics")
@@ -23,12 +30,14 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=30, help_text="name of the product")
-    brand = models.CharField()
+    brand = models.ForeignKey(Brand, related_name="products", on_delete=models.CASCADE)
     description = models.TextField()
     details = models.TextField()
     price = models.IntegerField()
     quantity = models.IntegerField()
-    category = models.ForeignKey(Category, related_name="products", on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, related_name="products", on_delete=models.CASCADE
+    )
     date_added = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
@@ -38,7 +47,9 @@ class Product(models.Model):
 class ProductImage(models.Model):
     photo = models.ImageField(upload_to="product_pics")
     is_main_photo = models.BooleanField(default=False)
-    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, related_name="images", on_delete=models.CASCADE
+    )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
