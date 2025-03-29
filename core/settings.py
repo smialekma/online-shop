@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "silk",
     "django_filters",
+    "crispy_forms",
+    "crispy_bootstrap4",
 ]
 
 INSTALLED_EXTENSIONS = [
@@ -140,3 +142,5 @@ MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CART_SESSION_ID = "cart"
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"
