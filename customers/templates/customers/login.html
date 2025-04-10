@@ -305,23 +305,33 @@
             }
         }
     </style>
-    <!-- REGISTER SECTION -->
+    <!-- LOGIN SECTION -->
     <div class="section">
         <div class="container">
             <div class="login-container">
                 <div class="login-header">
-                    <h2>Create New Account</h2>
+                    <h2>Login to Your Account</h2>
                 </div>
                 <div class="login-body">
                     <form method="post">
                         {% csrf_token %}
                         <div class="form-group">{{ form|crispy }}</div>
                         <div class="form-group">
-                            <button type="submit" class="primary-btn">Register</button>
+                            <div class="input-checkbox">
+                                <input type="checkbox" id="remember" name="remember">
+                                <label for="remember">
+                                    <span></span>
+                                    Remember me
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="primary-btn">Login</button>
                         </div>
                     </form>
                     <div class="login-footer">
-                        <a href="{% url "login-view" %}">Have an Account?</a>
+                        <a href="#">Forgot Password?</a>
+                        <a href="{% url "register-view" %}">Create New Account</a>
                     </div>
                     <div class="or-divider">
                         <span>OR</span>
