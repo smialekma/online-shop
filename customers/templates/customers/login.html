@@ -1,0 +1,349 @@
+{% extends "dashboard/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <!-- Custom CSS -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            color: #333;
+            background-color: #FBFBFC;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header Styles */
+        #top-header {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            background-color: #1E1F29;
+        }
+
+        .header-links li {
+            display: inline-block;
+            margin-right: 15px;
+            font-size: 12px;
+        }
+
+        .header-links li a {
+            color: #FFF;
+            text-decoration: none;
+        }
+
+        .header-links li a:hover {
+            color: #D10024;
+        }
+
+        .header-links li i {
+            margin-right: 5px;
+            color: #D10024;
+        }
+
+        #header {
+            padding-top: 15px;
+            padding-bottom: 15px;
+            background-color: #15161D;
+        }
+
+        .header-logo {
+            float: left;
+        }
+
+        .header-logo .logo img {
+            display: block;
+            max-height: 50px;
+        }
+
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        /* Navigation */
+        #navigation {
+            background: #FFF;
+            border-bottom: 2px solid #E4E7ED;
+            border-top: 3px solid #D10024;
+        }
+
+        /* Main Login Section */
+        .section {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+
+        .login-container {
+            max-width: 500px;
+            margin: 30px auto;
+            background-color: #FFF;
+            border: 1px solid #E4E7ED;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background-color: #15161D;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #D10024;
+        }
+
+        .login-header h2 {
+            color: #FFF;
+            text-transform: uppercase;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .login-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2B2D42;
+        }
+
+        .input {
+            height: 40px;
+            padding: 0px 15px;
+            border: 1px solid #E4E7ED;
+            background-color: #FFF;
+            width: 100%;
+            border-radius: 40px;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #D10024;
+        }
+
+        .primary-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #D10024;
+            border: none;
+            border-radius: 40px;
+            color: #FFF;
+            text-transform: uppercase;
+            font-weight: 700;
+            text-align: center;
+            transition: 0.2s all;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .primary-btn:hover, .primary-btn:focus {
+            opacity: 0.9;
+        }
+
+        .input-checkbox {
+            position: relative;
+            display: block;
+        }
+
+        .input-checkbox input[type="checkbox"]:not(:checked),
+        .input-checkbox input[type="checkbox"]:checked {
+            position: absolute;
+            margin-left: -9999px;
+            visibility: hidden;
+        }
+
+        .input-checkbox label {
+            font-weight: 500;
+            min-height: 20px;
+            padding-left: 20px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .input-checkbox input[type="checkbox"]+label span {
+            position: absolute;
+            left: 0px;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #E4E7ED;
+            background: #FFF;
+        }
+
+        .input-checkbox input[type="checkbox"]+label span:after {
+            content: '✔';
+            position: absolute;
+            top: -2px;
+            left: 1px;
+            font-size: 10px;
+            color: #FFF;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s;
+        }
+
+        .input-checkbox input[type="checkbox"]:checked+label span {
+            background-color: #D10024;
+            border-color: #D10024;
+        }
+
+        .input-checkbox input[type="checkbox"]:checked+label span:after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .login-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #E4E7ED;
+        }
+
+        .login-footer a {
+            color: #2B2D42;
+            font-weight: 500;
+            font-size: 12px;
+            text-decoration: none;
+            transition: 0.2s color;
+        }
+
+        .login-footer a:hover {
+            color: #D10024;
+        }
+
+        .or-divider {
+            position: relative;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .or-divider:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #E4E7ED;
+        }
+
+        .or-divider span {
+            position: relative;
+            display: inline-block;
+            background: #fff;
+            padding: 0 15px;
+            color: #8D99AE;
+            font-size: 14px;
+        }
+
+        .social-login {
+            text-align: center;
+        }
+
+        .social-btn {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            margin: 0 5px;
+            color: #fff;
+            font-size: 18px;
+            transition: 0.2s all;
+        }
+
+        .facebook-btn {
+            background-color: #3b5998;
+        }
+
+        .google-btn {
+            background-color: #db4437;
+        }
+
+        .twitter-btn {
+            background-color: #1da1f2;
+        }
+
+        .social-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Footer */
+        #footer {
+            background: #15161D;
+            color: #B9BABC;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 767px) {
+            .login-container {
+                margin: 15px;
+            }
+
+            .login-body {
+                padding: 20px;
+            }
+        }
+    </style>
+    <!-- LOGIN SECTION -->
+    <div class="section">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>Login to Your Account</h2>
+                </div>
+                <div class="login-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">{{ form|crispy }}</div>
+                        <div class="form-group">
+                            <div class="input-checkbox">
+                                <input type="checkbox" id="remember" name="remember">
+                                <label for="remember">
+                                    <span></span>
+                                    Remember me
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="primary-btn">Login</button>
+                        </div>
+                    </form>
+                    <div class="login-footer">
+                        <a href="#">Forgot Password?</a>
+                        <a href="{% url "register-view" %}">Create New Account</a>
+                    </div>
+                    <div class="or-divider">
+                        <span>OR</span>
+                    </div>
+                    <div class="social-login">
+                        <a href="#" class="social-btn facebook-btn"><i class="fa fa-facebook"></i></a>
+                        <a href="#" class="social-btn google-btn"><i class="fa fa-google"></i></a>
+                        <a href="#" class="social-btn twitter-btn"><i class="fa fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /LOGIN SECTION -->
+{% endblock %}

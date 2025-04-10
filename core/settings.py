@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from .env import env
-
+from django.contrib import messages
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "silk",
     "django_filters",
+    "crispy_forms",
+    "crispy_bootstrap4",
 ]
 
 INSTALLED_EXTENSIONS = [
@@ -35,6 +37,7 @@ INSTALLED_EXTENSIONS = [
     "payments.apps.PaymentsConfig",
     "product_reviews.apps.ProductReviewsConfig",
     "products.apps.ProductsConfig",
+    "orders.apps.OrdersConfig",
 ]
 
 
@@ -140,3 +143,23 @@ MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CART_SESSION_ID = "cart"
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "home-view"
+LOGOUT_REDIRECT_URL = "home-view"
+
+# User substitution
+# https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#auth-custom-user
+
+AUTH_USER_MODEL = "customers.Customer"
+
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "alert alert-secondary",
+    messages.INFO: "alert alert-info",
+    messages.SUCCESS: "alert alert-success",
+    messages.WARNING: "alert alert-warning",
+    messages.ERROR: "alert alert-danger",
+}

@@ -60,9 +60,32 @@
                         <li>
                             <a href="#"><i class="fa fa-dollar"></i> USD</a>
                         </li>
-                        <li>
-                            <a href="#"><i class="fa fa-user-o"></i> My Account</a>
-                        </li>
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a href="#"><i class="fa fa-user-o"></i> My Account</a>
+                            </li>
+                            <li>
+                                <form action="{% url "logout-view" %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            style="background: none;
+                                                   border: none;
+                                                   padding: 0;
+                                                   margin: 0;
+                                                   font-family: inherit;
+                                                   font-size: inherit;
+                                                   color: white;
+                                                   cursor: pointer;
+                                                   text-decoration: none">
+                                        <i class="fa fa-user-o"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{% url "login-view" %}"><i class="fa fa-user-o"></i> Login</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -202,6 +225,13 @@
             <!-- /container -->
         </nav>
         <!-- /NAVIGATION -->
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li {% if message.tags %}class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
         {% block content %}{% endblock %}
         <!-- NEWSLETTER -->
         <div id="newsletter" class="section">
@@ -317,9 +347,6 @@
                                 <h3 class="footer-title">Service</h3>
                                 <ul class="footer-links">
                                     <li>
-                                        <a href="#">My Account</a>
-                                    </li>
-                                    <li>
                                         <a href="#">View Cart</a>
                                     </li>
                                     <li>
@@ -331,61 +358,61 @@
                                     <li>
                                         <a href="#">Help</a>
                                     </li>
-                                </ul>
+                                    </>
+                                </div>
                             </div>
                         </div>
+                        <!-- /row -->
                     </div>
-                    <!-- /row -->
+                    <!-- /container -->
                 </div>
-                <!-- /container -->
-            </div>
-            <!-- /top footer -->
-            <!-- bottom footer -->
-            <div id="bottom-footer" class="section">
-                <div class="container">
-                    <!-- row -->
-                    <div class="row">
-                        <div class="col-md-12 text-center">
-                            <ul class="footer-payments">
-                                <li>
-                                    <a href="#"><i class="fa fa-cc-visa"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="fa fa-credit-card"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="fa fa-cc-paypal"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="fa fa-cc-mastercard"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="fa fa-cc-discover"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#"><i class="fa fa-cc-amex"></i></a>
-                                </li>
-                            </ul>
-                            <span class="copyright">
-                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                                Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                            </span>
+                <!-- /top footer -->
+                <!-- bottom footer -->
+                <div id="bottom-footer" class="section">
+                    <div class="container">
+                        <!-- row -->
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <ul class="footer-payments">
+                                    <li>
+                                        <a href="#"><i class="fa fa-cc-visa"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-credit-card"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-cc-paypal"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-cc-mastercard"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-cc-discover"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#"><i class="fa fa-cc-amex"></i></a>
+                                    </li>
+                                </ul>
+                                <span class="copyright">
+                                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                                    Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                                </span>
+                            </div>
                         </div>
+                        <!-- /row -->
                     </div>
-                    <!-- /row -->
+                    <!-- /container -->
                 </div>
-                <!-- /container -->
-            </div>
-            <!-- /bottom footer -->
-        </footer>
-        <!-- /FOOTER -->
-        <!-- jQuery Plugins -->
-        <script src="{% static "dashboard/js/jquery.min.js" %}"></script>
-        <script src="{% static "dashboard/js/bootstrap.min.js" %}"></script>
-        <script src="{% static "dashboard/js/slick.min.js" %}"></script>
-        <script src="{% static "dashboard/js/nouislider.min.js" %}"></script>
-        <script src="{% static "dashboard/js/jquery.zoom.min.js" %}"></script>
-        <script src="{% static "dashboard/js/main.js" %}"></script>
-    </body>
-</html>
+                <!-- /bottom footer -->
+            </footer>
+            <!-- /FOOTER -->
+            <!-- jQuery Plugins -->
+            <script src="{% static "dashboard/js/jquery.min.js" %}"></script>
+            <script src="{% static "dashboard/js/bootstrap.min.js" %}"></script>
+            <script src="{% static "dashboard/js/slick.min.js" %}"></script>
+            <script src="{% static "dashboard/js/nouislider.min.js" %}"></script>
+            <script src="{% static "dashboard/js/jquery.zoom.min.js" %}"></script>
+            <script src="{% static "dashboard/js/main.js" %}"></script>
+        </body>
+    </html>

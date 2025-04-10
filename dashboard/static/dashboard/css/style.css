@@ -45,6 +45,7 @@ Table OF Contents
 11 > FOOTER
 11 > SLICK STYLE
 12 > RESPONSIVE
+14 > FILTERING
 ------------------------------------*/
 
 /*=========================================================
@@ -2188,3 +2189,21 @@ textarea.input {
     margin-top: 10px;
   }
 }
+
+
+/*=========================================================
+	14 -> FILTER
+===========================================================*/
+
+ .filter-btn {
+      width: 160px;
+      height: 40px;
+      font-weight: 700;
+      background: #D10024;
+      color: #FFF;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      text-transform: uppercase;
+
+  }
