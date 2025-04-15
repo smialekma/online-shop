@@ -1,5 +1,6 @@
+from datetime import timezone
+
 from django.db import models
-from django.utils import timezone
 from PIL import Image
 
 
@@ -40,8 +41,17 @@ class Product(models.Model):
     )
     date_added = models.DateTimeField(default=timezone.now)
 
+    is_sale = models.BooleanField(default=False)
+    old_price = models.IntegerField(null=True, blank=True)
+
     def __str__(self) -> str:
         return self.name
+
+    def newer_than_x_days(self) -> bool:
+        return (timezone.now() - self.date_added).days < 10
+
+    def sale_percentage(self) -> int:
+        return round((self.old_price - self.price) / self.old_price * 100)
 
 
 class ProductImage(models.Model):
