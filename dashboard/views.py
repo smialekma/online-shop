@@ -1,6 +1,6 @@
 import random
 
-from django.db.models import Count
+from django.db.models import Count, F
 from django.views.generic import TemplateView
 from django.db.models import Prefetch
 from products.models import Category, Product, ProductImage
@@ -47,6 +47,21 @@ class HomeView(TemplateView):
         context["category_display"] = categories[:3]
 
         context["random_products"] = _get_random_products(6)
+
+        context["discounted_products"] = (
+            Product.objects.all()
+            .filter(is_sale=True)
+            .select_related("category")
+            .annotate(discount=F("old_price") - F("price"))
+            .order_by("-discount")
+            .prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=ProductImage.objects.filter(is_main_photo=True),
+                    to_attr="main_images",
+                )
+            )
+        )[:5]
 
         context["top_selling_products"] = []
         context["new_products"] = []

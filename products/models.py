@@ -1,7 +1,6 @@
-from datetime import timezone
-
 from django.db import models
 from PIL import Image
+from django.utils import timezone
 
 
 class Brand(models.Model):
@@ -34,7 +33,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, related_name="products", on_delete=models.CASCADE)
     description = models.TextField()
     details = models.TextField()
-    price = models.IntegerField()
+    price = models.DecimalField(decimal_places=2, max_digits=8)
     quantity = models.IntegerField()
     category = models.ForeignKey(
         Category, related_name="products", on_delete=models.CASCADE
@@ -42,7 +41,9 @@ class Product(models.Model):
     date_added = models.DateTimeField(default=timezone.now)
 
     is_sale = models.BooleanField(default=False)
-    old_price = models.IntegerField(null=True, blank=True)
+    old_price = models.DecimalField(
+        decimal_places=2, max_digits=8, null=True, blank=True
+    )
 
     def __str__(self) -> str:
         return self.name
