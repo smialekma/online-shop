@@ -2,4 +2,8 @@ from .models import Category
 
 
 def categories(request):
-    return {"categories": Category.objects.all().prefetch_related("products")}
+    return {
+        "categories": Category.objects.all()
+        .prefetch_related("products")
+        .order_by("name")
+    }

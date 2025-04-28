@@ -4,7 +4,7 @@ from django.views.generic import CreateView
 from django.contrib import messages
 from django.contrib.auth import views
 
-from .forms import CustomerRegisterForm
+from .forms import CustomerRegisterForm, LoginForm
 
 
 class RegisterView(SuccessMessageMixin, CreateView):
@@ -15,9 +15,15 @@ class RegisterView(SuccessMessageMixin, CreateView):
 
 
 class CustomLoginView(SuccessMessageMixin, views.LoginView):
-    success_message = "You have been successfully login in."
+    success_message = "You have been successfully logged in."
+    form_class = LoginForm
 
-    pass
+    def form_valid(self, form):
+        remember_me = form.cleaned_data["remember_me"]
+        if not remember_me:
+            self.request.session.set_expiry(0)
+            self.request.session.modified = True
+        return super(CustomLoginView, self).form_valid(form)
 
 
 class CustomLogoutView(views.LogoutView):
