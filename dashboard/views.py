@@ -61,7 +61,21 @@ class HomeView(TemplateView):
                     to_attr="main_images",
                 )
             )
-        )[:5]
+        )[:6]
+
+        context["top_rated_products"] = (
+            Product.objects.all()
+            .select_related("category")
+            .prefetch_related("reviews")
+            .order_by("reviews__rating")
+            .prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=ProductImage.objects.filter(is_main_photo=True),
+                    to_attr="main_images",
+                )
+            )
+        )[:6]
 
         context["top_selling_products"] = []
         context["new_products"] = []
@@ -86,7 +100,7 @@ class HomeView(TemplateView):
                 .filter(category=category.id)
                 .select_related("category")
                 .annotate(count=Count("orders"))
-                .order_by("count")
+                .order_by("-count")
                 .prefetch_related(
                     Prefetch(
                         "images",

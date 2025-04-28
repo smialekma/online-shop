@@ -1,6 +1,9 @@
 from django.db import models
 from PIL import Image
+from django.db.models import Count
 from django.utils import timezone
+
+from orders.models import OrderItem
 
 
 class Brand(models.Model):
@@ -53,6 +56,36 @@ class Product(models.Model):
 
     def sale_percentage(self) -> int:
         return round((self.old_price - self.price) / self.old_price * 100)
+
+    def get_related_products(self, *, limit: int):
+        order_ids = OrderItem.objects.filter(product_id=self).values_list(
+            "order_id", flat=True
+        )
+
+        related_products_ids = (
+            OrderItem.objects.filter(order_id__in=order_ids)
+            .exclude(product_id=self)
+            .values_list("product_id", flat=True)
+        )
+
+        products_counts = (
+            OrderItem.objects.filter(product_id__in=related_products_ids)
+            .values("product_id")
+            .annotate(count=Count("product_id"))
+            .order_by("-count")
+        )
+
+        related_products = []
+
+        for item in products_counts[:limit]:
+            product = Product.objects.get(id=item["product_id"])
+            main_photo = ProductImage.objects.filter(
+                product_id=product, is_main_photo=True
+            ).first()
+
+            related_products.append({"product": product, "main_photo": main_photo})
+
+        return related_products
 
 
 class ProductImage(models.Model):
