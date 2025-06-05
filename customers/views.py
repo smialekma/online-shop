@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.contrib import messages
 from django.contrib.auth import views
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 
 from .forms import CustomerRegisterForm, LoginForm
 
@@ -33,3 +34,22 @@ class CustomLogoutView(views.LogoutView):
         messages.success(request, self.success_message)
 
         return super().post(request, *args, **kwargs)
+
+
+class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+    template_name = "customers/password_reset.html"
+    email_template_name = "customers/password_reset_email.html"
+    subject_template_name = "customers/password_reset_subject"
+    success_message = (
+        "We've emailed you instructions for setting your password, "
+        "if an account exists with the email you entered, you should receive them shortly."
+        " If you don't receive an email, "
+        "please make sure you've entered the address you registered with, and check your spam folder."
+    )
+    success_url = reverse_lazy("home-view")
+
+
+class CustomPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView):
+    success_url = reverse_lazy("home-view")
+    success_message = "Your password has been set. You may now log in."
+    template_name = "customers/password_reset_confirm.html"
