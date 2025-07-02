@@ -1,4 +1,5 @@
 {% extends "dashboard/base.html" %}
+{% load product_tags %}
 {% block content %}
     <!-- BREADCRUMB -->
     <div id="breadcrumb" class="section">
@@ -9,10 +10,10 @@
                 <div class="col-md-12">
                     <ul class="breadcrumb-tree">
                         <li>
-                            <a href="#">Home</a>
+                            <a href="{% url "home-view" %}">Home</a>
                         </li>
                         <li>
-                            <a href="#">All Categories</a>
+                            <a href="{% url "product-view" %}">All Categories</a>
                         </li>
                         <li>
                             <a href="#">Accessories</a>
@@ -52,7 +53,7 @@
                                         <label for="{{ choice.id_for_label }}">
                                             <span></span>
                                             {{ choice.choice_label }}
-                                            <small>({{ choice.products.count }})</small>
+                                            <small>({% get_category_product_count choice.data.value.value %})</small>
                                         </label>
                                     </div>
                                 {% endfor %}
@@ -84,7 +85,7 @@
                                         <label for="{{ choice.id_for_label }}">
                                             <span></span>
                                             {{ choice.choice_label | upper }}
-                                            <small>({{ choice.products.count }})</small>
+                                            <small>({% get_brand_product_count choice.data.value.value %})</small>
                                         </label>
                                     </div>
                                 {% endfor %}
@@ -111,7 +112,7 @@
                                 <div class="product-body">
                                     <p class="product-category">{{ product.category }}</p>
                                     <h3 class="product-name">
-                                        <a href="#">{{ product.name }}</a>
+                                        <a href="{% url "detail-view" product.id %}">{{ product.name }}</a>
                                     </h3>
                                     {% if product.is_sale %}
                                         <h4 class="product-price">
@@ -160,7 +161,7 @@
                                     <div class="product-body">
                                         <p class="product-category">{{ product.category.name }}</p>
                                         <h3 class="product-name">
-                                            <a href="#">{{ product.name }}</a>
+                                            <a href="{% url "detail-view" product.id %}">{{ product.name }}</a>
                                         </h3>
                                         <h4 class="product-price">
                                             {{ product.price }} <del class="product-old-price">$990.00</del>

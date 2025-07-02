@@ -1,11 +1,14 @@
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, Avg
 from django.shortcuts import get_object_or_404
+from django.views.generic import CreateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from product_reviews.models import Review
 from .filters import ProductFilter
 from .models import Product, ProductImage
 from django.shortcuts import redirect
+from product_reviews.forms import ReviewForm
 
 from carts.cart import Cart
 from django.core.paginator import Paginator
@@ -51,19 +54,43 @@ class ProductView(ListView):
         return context_data
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(CreateView, DetailView):
     model = Product
     template_name = "products/product_details.html"
+    form_class = ReviewForm
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context_data = super().get_context_data(**kwargs)
 
         product = self.get_object()
         context_data["product"] = product
+        reviews = (
+            Review.objects.filter(product_id=product.id)
+            .select_related("author")
+            .order_by("-created_at")
+        )
+        review_aggregations = reviews.aggregate(
+            average_rating=Avg("rating"), review_count=Count("id")
+        )
+        context_data["review_aggregations"] = review_aggregations
+        context_data["reviews"] = reviews
+        context_data["rating_options"] = (1, 2, 3, 4, 5)
 
         context_data["related_products"] = product.get_related_products(limit=5)
+        context_data["form"] = ReviewForm()
         print(context_data)
         return context_data
+
+    def form_valid(self, form):
+        obj = form.save(commit=False)
+        obj.author = self.request.user
+        product = self.get_object()
+        obj.product = product
+        obj.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return str(self.get_object().id)
 
 
 def add_product(request):

@@ -1,4 +1,5 @@
 {% extends "dashboard/base.html" %}
+{% load product_tags %}
 {% block content %}
     <!-- BREADCRUMB -->
     <div id="breadcrumb" class="section">
@@ -9,13 +10,13 @@
                 <div class="col-md-12">
                     <ul class="breadcrumb-tree">
                         <li>
-                            <a href="#">Home</a>
+                            <a href="{% url "home-view" %}">Home</a>
                         </li>
                         <li>
-                            <a href="#">All Categories</a>
+                            <a href="{% url "product-view" %}">All Categories</a>
                         </li>
                         <li>
-                            <a href="#">{{ product.category }}</a>
+                            <a href="{% url "product-view" %}?category={{ product.category.id }}">{{ product.category.name }}</a>
                         </li>
                         <li class="active">{{ product.name }}</li>
                     </ul>
@@ -60,19 +61,25 @@
                         <h2 class="product-name">{{ product.name }}</h2>
                         <div>
                             <div class="product-rating">
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star-o"></i>
+                                {% for number in rating_options %}
+                                    {% if number > review_aggregations.average_rating %}
+                                        <i class="fa fa-star-o"></i>
+                                    {% else %}
+                                        <i class="fa fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
                             </div>
-                            <a class="review-link" href="#">10 Review(s) | Add your review</a>
+                            <a class="review-link" href="#">{{ review_aggregations.review_count }} Review(s) | Add your review</a>
                         </div>
                         <div>
-                            <h3 class="product-price">
-                                {{ product.price }} <del class="product-old-price">$990.00</del>
-                            </h3>
-                            <span class="product-available">In Stock</span>
+                            {% if product.is_sale %}
+                                <h3 class="product-price">
+                                    {{ product.price }} <del class="product-old-price">{{ product.old_price }}</del>
+                                </h3>
+                            {% else %}
+                                <h3 class="product-price">{{ product.price }}</h3>
+                            {% endif %}
+                            {% if product.quantity > 0 %}<span class="product-available">In Stock</span>{% endif %}
                         </div>
                         <p>{{ product.description }}</p>
                         <div class="product-options">
@@ -113,7 +120,7 @@
                         <ul class="product-links">
                             <li>Category:</li>
                             <li>
-                                <a href="#">{{ product.category }}</a>
+                                <a href="{% url "product-view" %}?category={{ product.category.id }}">{{ product.category.name }}</a>
                             </li>
                         </ul>
                         <ul class="product-links">
@@ -146,7 +153,7 @@
                                 <a data-toggle="tab" href="#tab2">Details</a>
                             </li>
                             <li>
-                                <a data-toggle="tab" href="#tab3">Reviews (3)</a>
+                                <a data-toggle="tab" href="#tab3">Reviews ({{ review_aggregations.review_count }})</a>
                             </li>
                         </ul>
                         <!-- /product tab nav -->
@@ -177,13 +184,15 @@
                                     <div class="col-md-3">
                                         <div id="rating">
                                             <div class="rating-avg">
-                                                <span>4.5</span>
+                                                <span>{{ review_aggregations.average_rating|floatformat:"1" }}</span>
                                                 <div class="rating-stars">
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star"></i>
-                                                    <i class="fa fa-star-o"></i>
+                                                    {% for number in rating_options %}
+                                                        {% if number > review_aggregations.average_rating %}
+                                                            <i class="fa fa-star-o"></i>
+                                                        {% else %}
+                                                            <i class="fa fa-star"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
                                                 </div>
                                             </div>
                                             <ul class="rating">
@@ -196,9 +205,9 @@
                                                         <i class="fa fa-star"></i>
                                                     </div>
                                                     <div class="rating-progress">
-                                                        <div style="width: 80%;"></div>
+                                                        <div style="{% get_review_percentage_5 product.id %}"></div>
                                                     </div>
-                                                    <span class="sum">3</span>
+                                                    <span class="sum">{% get_review_count_5 product.id %}</span>
                                                 </li>
                                                 <li>
                                                     <div class="rating-stars">
@@ -209,9 +218,9 @@
                                                         <i class="fa fa-star-o"></i>
                                                     </div>
                                                     <div class="rating-progress">
-                                                        <div style="width: 60%;"></div>
+                                                        <div style="{% get_review_percentage_4 product.id %}"></div>
                                                     </div>
-                                                    <span class="sum">2</span>
+                                                    <span class="sum">{% get_review_count_4 product.id %}</span>
                                                 </li>
                                                 <li>
                                                     <div class="rating-stars">
@@ -222,9 +231,9 @@
                                                         <i class="fa fa-star-o"></i>
                                                     </div>
                                                     <div class="rating-progress">
-                                                        <div></div>
+                                                        <div style="{% get_review_percentage_3 product.id %}"></div>
                                                     </div>
-                                                    <span class="sum">0</span>
+                                                    <span class="sum">{% get_review_count_3 product.id %}</span>
                                                 </li>
                                                 <li>
                                                     <div class="rating-stars">
@@ -235,9 +244,9 @@
                                                         <i class="fa fa-star-o"></i>
                                                     </div>
                                                     <div class="rating-progress">
-                                                        <div></div>
+                                                        <div style="{% get_review_percentage_2 product.id %}"></div>
                                                     </div>
-                                                    <span class="sum">0</span>
+                                                    <span class="sum">{% get_review_count_2 product.id %}</span>
                                                 </li>
                                                 <li>
                                                     <div class="rating-stars">
@@ -248,9 +257,9 @@
                                                         <i class="fa fa-star-o"></i>
                                                     </div>
                                                     <div class="rating-progress">
-                                                        <div></div>
+                                                        <div style="{% get_review_percentage_1 product.id %}"></div>
                                                     </div>
-                                                    <span class="sum">0</span>
+                                                    <span class="sum">{% get_review_count_1 product.id %}</span>
                                                 </li>
                                             </ul>
                                         </div>
@@ -260,60 +269,27 @@
                                     <div class="col-md-6">
                                         <div id="reviews">
                                             <ul class="reviews">
-                                                <li>
-                                                    <div class="review-heading">
-                                                        <h5 class="name">John</h5>
-                                                        <p class="date">27 DEC 2018, 8:0 PM</p>
-                                                        <div class="review-rating">
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star-o empty"></i>
+                                                {% for review in reviews %}
+                                                    <li>
+                                                        <div class="review-heading">
+                                                            <h5 class="name">{{ review.user_id.username }}</h5>
+                                                            <p class="date">{{ review.created_at }}</p>
+                                                            <div class="review-rating">
+                                                                {% for number in rating_options %}
+                                                                    {% if number > review.rating %}
+                                                                        <i class="fa fa-star-o"></i>
+                                                                    {% else %}
+                                                                        <i class="fa fa-star"></i>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="review-body">
-                                                        <p>
-                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
-                                                        </p>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="review-heading">
-                                                        <h5 class="name">John</h5>
-                                                        <p class="date">27 DEC 2018, 8:0 PM</p>
-                                                        <div class="review-rating">
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star-o empty"></i>
+                                                        <div class="review-body">
+                                                            <h5>{{ review.title }}</h5>
+                                                            <p>{{ review.body }}</p>
                                                         </div>
-                                                    </div>
-                                                    <div class="review-body">
-                                                        <p>
-                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
-                                                        </p>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="review-heading">
-                                                        <h5 class="name">John</h5>
-                                                        <p class="date">27 DEC 2018, 8:0 PM</p>
-                                                        <div class="review-rating">
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star"></i>
-                                                            <i class="fa fa-star-o empty"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="review-body">
-                                                        <p>
-                                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
-                                                        </p>
-                                                    </div>
-                                                </li>
+                                                    </li>
+                                                {% endfor %}
                                             </ul>
                                             <ul class="reviews-pagination">
                                                 <li class="active">1</li>
@@ -334,31 +310,45 @@
                                     </div>
                                     <!-- /Reviews -->
                                     <!-- Review Form -->
-                                    <div class="col-md-3">
-                                        <div id="review-form">
-                                            <form class="review-form">
-                                                <input class="input" type="text" placeholder="Your Name">
-                                                <input class="input" type="email" placeholder="Your Email">
-                                                <textarea class="input" placeholder="Your Review"></textarea>
-                                                <div class="input-rating">
-                                                    <span>Your Rating:</span>
-                                                    <div class="stars">
-                                                        <input id="star5" name="rating" value="5" type="radio">
-                                                        <label for="star5"></label>
-                                                        <input id="star4" name="rating" value="4" type="radio">
-                                                        <label for="star4"></label>
-                                                        <input id="star3" name="rating" value="3" type="radio">
-                                                        <label for="star3"></label>
-                                                        <input id="star2" name="rating" value="2" type="radio">
-                                                        <label for="star2"></label>
-                                                        <input id="star1" name="rating" value="1" type="radio">
-                                                        <label for="star1"></label>
+                                    {% if user.is_authenticated %}
+                                        <div class="col-md-3">
+                                            <div id="review-form">
+                                                <form class="review-form" method="post">
+                                                    {% csrf_token %}
+                                                    {{ form.title }}
+                                                    {{ form.body }}
+                                                    <div class="input-rating">
+                                                        <span>Your Rating:</span>
+                                                        <div class="stars">
+                                                            {% for choice in form.rating %}
+                                                                {{ choice.tag }}
+                                                                <label for="{{ choice.id_for_label }}"></label>
+                                                            {% endfor %}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <button class="primary-btn">Submit</button>
-                                            </form>
+                                                    <button type="submit" class="primary-btn">Submit</button>
+                                                </form>
+                                            </div>
                                         </div>
-                                    </div>
+                                        {#                                                <input class="input" type="text" placeholder="Review Title">#}
+                                        {#                                                <textarea class="input" placeholder="Your Review"></textarea>#}
+                                        {#                                                <div class="input-rating">#}
+                                        {#                                                    <span>Your Rating:</span>#}
+                                        {#                                                    <div class="stars">#}
+                                        {#                                                        <input id="star5" name="rating" value="5" type="radio">#}
+                                        {#                                                        <label for="star5"></label>#}
+                                        {#                                                        <input id="star4" name="rating" value="4" type="radio">#}
+                                        {#                                                        <label for="star4"></label>#}
+                                        {#                                                        <input id="star3" name="rating" value="3" type="radio">#}
+                                        {#                                                        <label for="star3"></label>#}
+                                        {#                                                        <input id="star2" name="rating" value="2" type="radio">#}
+                                        {#                                                        <label for="star2"></label>#}
+                                        {#                                                        <input id="star1" name="rating" value="1" type="radio">#}
+                                        {#                                                        <label for="star1"></label>#}
+                                        {#                                                    </div>#}
+                                        {#                                                </div>#}
+                                        {#                                                <button class="primary-btn">Submit</button>#}
+                                    {% endif %}
                                     <!-- /Review Form -->
                                 </div>
                             </div>
@@ -403,7 +393,7 @@
                             <div class="product-body">
                                 <p class="product-category">{{ item.product.category }}</p>
                                 <h3 class="product-name">
-                                    <a href="#">{{ item.product.name }}</a>
+                                    <a href="{% url "detail-view" item.product.id %}">{{ item.product.name }}</a>
                                 </h3>
                                 {% if item.product.is_sale %}
                                     <h4 class="product-price">

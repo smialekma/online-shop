@@ -20,7 +20,13 @@ def _get_random_products(number_of_products):
     my_ids = Product.objects.values_list("id", flat=True)
     my_ids = list(my_ids)
 
-    rand_ids = random.sample(my_ids, number_of_products)
+    available_products = len(my_ids)
+    products_to_get = min(number_of_products, available_products)
+
+    if products_to_get == 0:
+        return Product.objects.none()
+
+    rand_ids = random.sample(my_ids, products_to_get)
 
     random_records = (
         Product.objects.filter(id__in=rand_ids)

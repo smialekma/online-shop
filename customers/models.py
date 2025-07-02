@@ -41,7 +41,7 @@ class UserManager(BaseUserManager):
 class Customer(AbstractUser):  # AbstractBaseUser
     """User model."""
 
-    username = None
+    username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(_("email address"), unique=True)
     address = models.ForeignKey(
         CustomerAddress,
