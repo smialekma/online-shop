@@ -69,16 +69,22 @@ class ProductDetailView(CreateView, DetailView):
             .select_related("author")
             .order_by("-created_at")
         )
+
+        paginator = Paginator(reviews, 3)
+        page_number = self.request.GET.get("page", 1)
+        page_obj = paginator.get_page(page_number)
+        context_data["page_obj"] = page_obj
+        context_data["paginator"] = paginator
+
         review_aggregations = reviews.aggregate(
             average_rating=Avg("rating"), review_count=Count("id")
         )
         context_data["review_aggregations"] = review_aggregations
-        context_data["reviews"] = reviews
+        context_data["reviews"] = page_obj
         context_data["rating_options"] = (1, 2, 3, 4, 5)
 
         context_data["related_products"] = product.get_related_products(limit=5)
         context_data["form"] = ReviewForm()
-        print(context_data)
         return context_data
 
     def form_valid(self, form):

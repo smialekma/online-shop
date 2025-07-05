@@ -291,21 +291,27 @@
                                                     </li>
                                                 {% endfor %}
                                             </ul>
-                                            <ul class="reviews-pagination">
-                                                <li class="active">1</li>
-                                                <li>
-                                                    <a href="#">2</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">3</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">4</a>
-                                                </li>
-                                                <li>
-                                                    <a href="#"><i class="fa fa-angle-right"></i></a>
-                                                </li>
-                                            </ul>
+                                            {% if page_obj.has_other_pages %}
+                                                <ul class="reviews-pagination">
+                                                    {% if page_obj.has_previous %}
+                                                        <li>
+                                                            <a href="{% querystring page=page_obj.previous_page_number %}"><i class="fa fa-angle-left"></i></a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{% querystring page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                                                        </li>
+                                                    {% endif %}
+                                                    <li class="active">{{ page_obj.number }}</li>
+                                                    {% if page_obj.has_next %}
+                                                        <li>
+                                                            <a href="{% querystring page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{% querystring page=page_obj.next_page_number %}"><i class="fa fa-angle-right"></i></a>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <!-- /Reviews -->
@@ -321,6 +327,7 @@
                                                         <span>Your Rating:</span>
                                                         <div class="stars">
                                                             {% for choice in form.rating %}
+                                                                {#                                                                <p> Choice {{ choice.choice_value }} - {{ choice.choice_label }}</p>#}
                                                                 {{ choice.tag }}
                                                                 <label for="{{ choice.id_for_label }}"></label>
                                                             {% endfor %}
@@ -430,4 +437,44 @@
         <!-- /container -->
     </div>
     <!-- /Section -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+    var storageKey = 'activeTab_product_{{ product.id }}';
+
+    var savedTab = localStorage.getItem(storageKey);
+
+    if (savedTab) {
+
+        var allNavItems = document.querySelectorAll('.tab-nav li');
+        var allTabPanes = document.querySelectorAll('.tab-pane');
+
+        allNavItems.forEach(function(item) {
+            item.classList.remove('active');
+        });
+
+        allTabPanes.forEach(function(pane) {
+            pane.classList.remove('active', 'in');
+        });
+
+        var savedTabLink = document.querySelector('a[href="' + savedTab + '"]');
+        var savedTabPane = document.querySelector(savedTab);
+
+        if (savedTabLink && savedTabPane) {
+            savedTabLink.parentElement.classList.add('active');
+            savedTabPane.classList.add('active', 'in');
+        }
+    }
+
+    var tabLinks = document.querySelectorAll('.tab-nav a[data-toggle="tab"]');
+    tabLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            var clickedTab = this.getAttribute('href');
+
+            localStorage.setItem(storageKey, clickedTab);
+        });
+    });
+    });
+
+    </script>
 {% endblock %}
