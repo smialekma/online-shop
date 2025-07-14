@@ -1,11 +1,12 @@
 import django_filters
 from django import forms
 from .models import Product, Category, Brand
+from django.db.models import Count
 
 
 class ProductFilter(django_filters.FilterSet):
     category = django_filters.ModelMultipleChoiceFilter(
-        queryset=Category.objects.all(),
+        queryset=Category.objects.annotate(products_count=Count("products")),
         widget=forms.CheckboxSelectMultiple,
         label="Categories",
     )

@@ -13,22 +13,14 @@
                     {% csrf_token %}
                     <div class="form-group">{{ form|crispy }}</div>
                     <div class="form-group">
-                        <div class="input-checkbox">
-                            <input type="checkbox" id="remember" name="remember">
-                            <label for="remember">
-                                <span></span>
-                                Remember me
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <button type="submit" class="primary-btn">Login</button>
                     </div>
                 </form>
                 <div class="login-footer">
-                    <a href="#">Forgot Password?</a>
+                    <a href="{% url "password_reset" %}">Forgot Password?</a>
                     <a href="{% url "register-view" %}">Create New Account</a>
                 </div>
+                {% comment %}
                 <div class="or-divider">
                     <span>OR</span>
                 </div>
@@ -37,6 +29,7 @@
                     <a href="#" class="social-btn google-btn"><i class="fa fa-google"></i></a>
                     <a href="#" class="social-btn twitter-btn"><i class="fa fa-twitter"></i></a>
                 </div>
+                {% endcomment %}
             </div>
         </div>
     </div>
