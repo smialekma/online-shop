@@ -5,7 +5,7 @@ from customer_addresses.models import CustomerAddress
 
 
 class Order(models.Model):
-    customer_id = models.ForeignKey(
+    customer = models.ForeignKey(
         Customer,
         related_name="orders",
         on_delete=models.SET_NULL,
@@ -15,7 +15,7 @@ class Order(models.Model):
     is_payed = models.BooleanField()
     date_ordered = models.DateTimeField()
     date_fulfilled = models.DateTimeField()
-    address_id = models.ForeignKey(
+    address = models.ForeignKey(
         CustomerAddress,
         related_name="orders",
         on_delete=models.SET_NULL,
@@ -25,14 +25,14 @@ class Order(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
     total_amount = models.DecimalField(decimal_places=2, max_digits=8)
-    shipping_tracker = models.TextField()
+    # shipping_tracker = models.TextField()
 
 
 class OrderItem(models.Model):
-    order_id = models.ForeignKey(
+    order = models.ForeignKey(
         Order, related_name="order_items", on_delete=models.CASCADE
     )
-    product_id = models.ForeignKey(
+    product = models.ForeignKey(
         "products.Product",
         related_name="orders",
         on_delete=models.SET_NULL,
