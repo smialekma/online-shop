@@ -1,4 +1,6 @@
-import factory
+from datetime import timezone
+
+import factory.fuzzy
 
 from .models import Brand, Category, Product, ProductImage
 
@@ -88,7 +90,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
     price = factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
     quantity = factory.Faker("random_int", min=0, max=1000000)
     category = factory.SubFactory(CategoryFactory)
-    date_added = factory.Faker("date_time")
+    date_added = factory.Faker("date_time", tzinfo=timezone.utc)
 
     is_sale = False
     old_price = factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
@@ -99,6 +101,12 @@ class ProductImageFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ProductImage
 
-    photo = factory.django.ImageField()
-    is_main_photo = factory.Faker("pybool")
+    photo = factory.django.ImageField(
+        color=factory.fuzzy.FuzzyChoice(
+            ["blue", "yellow", "green", "orange", "red", "purple"]
+        ),
+        height=factory.fuzzy.FuzzyInteger(10, 1000),
+        width=factory.fuzzy.FuzzyInteger(10, 1000),
+    )
+    is_main_photo = False
     product = factory.SubFactory(ProductFactory)
