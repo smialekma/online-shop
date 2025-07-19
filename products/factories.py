@@ -75,7 +75,13 @@ class CategoryFactory(factory.django.DjangoModelFactory):
         model = Category
 
     name = factory.Iterator(CATEGORY_NAMES)
-    photo = factory.django.ImageField()
+    photo = factory.django.ImageField(
+        color=factory.fuzzy.FuzzyChoice(
+            ["blue", "yellow", "green", "orange", "red", "purple"]
+        ),
+        height=400,
+        width=600,
+    )
 
 
 class ProductFactory(factory.django.DjangoModelFactory):
@@ -105,8 +111,8 @@ class ProductImageFactory(factory.django.DjangoModelFactory):
         color=factory.fuzzy.FuzzyChoice(
             ["blue", "yellow", "green", "orange", "red", "purple"]
         ),
-        height=factory.fuzzy.FuzzyInteger(10, 1000),
-        width=factory.fuzzy.FuzzyInteger(10, 1000),
+        height=600,
+        width=600,
     )
     is_main_photo = False
     product = factory.SubFactory(ProductFactory)

@@ -70,7 +70,10 @@ def get_review_percentage_with_specific_rating(product_id, rating: int) -> str:
     all_reviews: int = Review.objects.filter(product_id=product_id).count()
     reviews_with_rating = get_review_count_with_specific_rating(product_id, rating)
 
-    return f"width: {round((reviews_with_rating/all_reviews) * 100)}%;"
+    if all_reviews > 0:
+        return f"width: {round((reviews_with_rating/all_reviews) * 100)}%;"
+    else:
+        return "width: 0%;"
 
 
 @register.simple_tag
