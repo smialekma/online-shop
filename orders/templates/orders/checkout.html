@@ -1,0 +1,143 @@
+{% extends "dashboard/base.html" %}
+{% load crispy_forms_filters %}
+{% block content %}
+    <!-- BREADCRUMB -->
+    <div id="breadcrumb" class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="breadcrumb-header">Checkout</h3>
+                    <ul class="breadcrumb-tree">
+                        <li>
+                            <a href="#">Home</a>
+                        </li>
+                        <li class="active">Checkout</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /row -->
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /BREADCRUMB -->
+    <!-- SECTION -->
+    <div class="section">
+        <!-- container -->
+        <div class="container">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <!-- row -->
+                <div class="row">
+                    <div class="col-md-7">
+                        <!-- Billing Details -->
+                        <div class="billing-details">
+                            <div class="section-title">
+                                <h3 class="title">Shipping address</h3>
+                            </div>
+                            {% for field in form %}
+                                {#                                    {% if field.name != 'agree' %}#}
+                                {{ field|as_crispy_field }}
+                                {#                                    {% endif %}#}
+                            {% endfor %}
+                            {#                            <div class="input-checkbox">#}
+                            {#                                {{ form.agree }}#}
+                            {#                                <label for="{{ form.agree.id_for_label }}">#}
+                            {#                                    <span></span>#}
+                            {#                                I've read and accept the <a href="#" target="_blank">terms & conditions</a>*#}
+                            {#                                </label>#}
+                            {#                                {% if form.agree.errors %}#}
+                            {#                                  <div>{{ form.agree.errors }}</div>#}
+                            {#                                {% endif %}#}
+                            {#                            </div>#}
+                        </div>
+                    </div>
+                    <!-- /Billing Details -->
+                    <!-- Order Details -->
+                    <div class="col-md-5 order-details">
+                        <div class="section-title text-center">
+                            <h3 class="title">Your Order</h3>
+                        </div>
+                        <div class="order-summary">
+                            <div class="order-col">
+                                <div>
+                                    <strong>PRODUCT</strong>
+                                </div>
+                                <div>
+                                    <strong>TOTAL</strong>
+                                </div>
+                            </div>
+                            <div class="order-products">
+                                {% for cart_item in cart %}
+                                    <div class="order-col">
+                                        <div>{{ cart_item.quantity }}x {{ cart_item.product.name }}</div>
+                                        <div>{{ cart_item.total_price }}</div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="order-col">
+                                <div>Shipping</div>
+                                <div>
+                                    <strong>FREE</strong>
+                                </div>
+                            </div>
+                            <div class="order-col">
+                                <div>
+                                    <strong>TOTAL</strong>
+                                </div>
+                                <div>
+                                    <strong class="order-total">{{ cart.get_total_price }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="payment-method">
+                            <div class="input-radio">
+                                <input type="radio" name="payment" id="payment-1">
+                                <label for="payment-1">
+                                    <span></span>
+                                    Direct Bank Transfer
+                                </label>
+                                <div class="caption">
+                                    <p>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="input-radio">
+                                <input type="radio" name="payment" id="payment-2">
+                                <label for="payment-2">
+                                    <span></span>
+                                    Cheque Payment
+                                </label>
+                                <div class="caption">
+                                    <p>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="input-radio">
+                                <input type="radio" name="payment" id="payment-3">
+                                <label for="payment-3">
+                                    <span></span>
+                                    Paypal System
+                                </label>
+                                <div class="caption">
+                                    <p>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="primary-btn order-submit">Place order</button>
+                    </div>
+                    <!-- /Order Details -->
+                </div>
+                <!-- /row -->
+            </form>
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /SECTION -->
+{% endblock %}

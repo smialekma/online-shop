@@ -272,7 +272,7 @@
                                                 {% for review in reviews %}
                                                     <li>
                                                         <div class="review-heading">
-                                                            <h5 class="name">{{ review.user_id.username }}</h5>
+                                                            <h5 class="name">{{ review.author.username }}</h5>
                                                             <p class="date">{{ review.created_at }}</p>
                                                             <div class="review-rating">
                                                                 {% for number in rating_options %}
