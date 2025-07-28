@@ -1,4 +1,3 @@
-from customer_addresses.models import CustomerAddress
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -24,13 +23,6 @@ class Customer(AbstractUser):  # AbstractBaseUser
 
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(_("email address"), unique=True)
-    address = models.ForeignKey(
-        CustomerAddress,
-        related_name="addresses",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
     is_active = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"

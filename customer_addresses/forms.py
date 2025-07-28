@@ -1,6 +1,7 @@
 from django import forms
 
 from customer_addresses.models import CustomerAddress
+from django.utils.safestring import mark_safe
 
 
 class AddressForm(forms.ModelForm):
@@ -11,7 +12,9 @@ class AddressForm(forms.ModelForm):
         max_length=300,
     )
     agree = forms.BooleanField(
-        label='I agree to the <a href="/terms/" target="_blank">terms and conditions</a>',
+        label=mark_safe(
+            'I agree to the <a href="/terms/" target="_blank">terms and conditions</a>'
+        ),
         error_messages={"required": "You must accept the terms and conditions"},
         widget=forms.CheckboxInput(attrs={"class": "input-checkbox"}),
         required=True,

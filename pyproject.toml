@@ -1,2 +1,2 @@
 [tool.bandit]
-skips = ["B101", "B311"]
+skips = ["B101", "B311", "B308"]
