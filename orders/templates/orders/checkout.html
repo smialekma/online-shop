@@ -38,9 +38,7 @@
                                 <h3 class="title">Shipping address</h3>
                             </div>
                             {% for field in form %}
-                                {#                                    {% if field.name != 'agree' %}#}
-                                {{ field|as_crispy_field }}
-                                {#                                    {% endif %}#}
+                                {% if field.name != 'shipping_method' %}{{ field|as_crispy_field }}{% endif %}
                             {% endfor %}
                             {#                            <div class="input-checkbox">#}
                             {#                                {{ form.agree }}#}
@@ -80,7 +78,7 @@
                             <div class="order-col">
                                 <div>Shipping</div>
                                 <div>
-                                    <strong>FREE</strong>
+                                    <strong id="shipping-cost">–</strong>
                                 </div>
                             </div>
                             <div class="order-col">
@@ -88,8 +86,30 @@
                                     <strong>TOTAL</strong>
                                 </div>
                                 <div>
-                                    <strong class="order-total">{{ cart.get_total_price }}</strong>
+                                    <strong class="order-total"
+                                            id="order-total"
+                                            data-cart-total="{{ cart.get_total_price|floatformat:2 }}">
+                                        {{ cart.get_total_price }}
+                                    </strong>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="shipping-methods">
+                            <h4>Shipping Method</h4>
+                            <div id="shipping-method-options">
+                                {% for radio in form.shipping_method %}
+                                    <div class="input-radio">
+                                        {{ radio.tag }}
+                                        <label for="{{ radio.id_for_label }}" style="display: inline-block;">
+                                            <span class="shipping-price"
+                                                  data-price="{{ radio.choice_label.price|floatformat:2 }}"></span>
+                                            {{ radio.choice_label.name }} ({{ radio.choice_label.price }})
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                                {% if form.shipping_method.errors %}
+                                    <div class="text-danger" style="color: red;">{{ form.shipping_method.errors.0 }}</div>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="payment-method">
@@ -140,4 +160,31 @@
         <!-- /container -->
     </div>
     <!-- /SECTION -->
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const shippingOptions = document.querySelectorAll('input[name="shipping_method"]');
+    const shippingCostElement = document.getElementById('shipping-cost');
+    const orderTotalElement = document.getElementById('order-total');
+    const cartTotal = parseFloat(orderTotalElement.dataset.cartTotal);
+
+    function updateShippingCost() {
+        const selected = document.querySelector('input[name="shipping_method"]:checked');
+        if (selected) {
+            const priceLabel = selected.closest('.input-radio').querySelector('.shipping-price');
+            if (priceLabel) {
+                const shippingPrice = parseFloat(priceLabel.dataset.price.replace(',', '.'));
+                shippingCostElement.textContent = shippingPrice.toFixed(2);
+                const totalWithShipping = (cartTotal + shippingPrice).toFixed(2);
+                orderTotalElement.textContent = totalWithShipping;
+            }
+        }
+    }
+
+    shippingOptions.forEach(option => {
+        option.addEventListener('change', updateShippingCost);
+    });
+
+    updateShippingCost();
+});
+    </script>
 {% endblock %}

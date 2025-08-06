@@ -3,6 +3,8 @@ from django import forms
 from customer_addresses.models import CustomerAddress
 from django.utils.safestring import mark_safe
 
+from orders.models import ShippingMethod
+
 
 class AddressForm(forms.ModelForm):
     email = forms.EmailField(required=True)
@@ -20,9 +22,33 @@ class AddressForm(forms.ModelForm):
         required=True,
     )
 
+    shipping_method = forms.ModelChoiceField(
+        queryset=ShippingMethod.objects.all(),
+        widget=forms.RadioSelect,
+        required=True,
+        label="Shipping method",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["shipping_method"].label_from_instance = lambda obj: obj
+
     class Meta:
         model = CustomerAddress
-        fields = "__all__"
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "address_line",
+            "telephone",
+            "telephone",
+            "postal_code",
+            "city",
+            "country",
+            "order_notes",
+            "agree",
+            "shipping_method",
+        ]
 
     def clean_agree(self):
         agree = self.cleaned_data.get("agree")

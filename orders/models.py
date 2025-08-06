@@ -5,6 +5,14 @@ from customers.models import Customer
 from customer_addresses.models import CustomerAddress
 
 
+class ShippingMethod(models.Model):
+    name = models.CharField()
+    price = models.DecimalField(decimal_places=2, max_digits=5)
+
+    def __str__(self):
+        return self.name
+
+
 class Order(models.Model):
     customer = models.ForeignKey(
         Customer,
@@ -28,7 +36,13 @@ class Order(models.Model):
     total_amount = models.DecimalField(decimal_places=2, max_digits=8)
     order_notes = models.TextField(max_length=300, blank=True, null=True)
     email = models.EmailField()
-    # shipping_tracker = models.TextField()
+    shipping_method = models.ForeignKey(
+        ShippingMethod,
+        related_name="orders",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
 
 
 class OrderItem(models.Model):
