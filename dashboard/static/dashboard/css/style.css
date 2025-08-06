@@ -75,6 +75,11 @@ a {
   transition: 0.2s color;
 }
 
+a.disabled {
+  pointer-events: none;
+  cursor: default;
+}
+
 a:hover, a:focus {
   color: #D10024;
   text-decoration: none;
@@ -613,6 +618,10 @@ textarea.input {
 
 .cart-dropdown .cart-btns>a:hover {
   opacity: 0.9;
+}
+
+.cart-dropdown .cart-btns>a.disabled {
+  background-color: #8c8c8c;
 }
 
 .cart-dropdown .cart-summary {

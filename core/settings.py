@@ -75,6 +75,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "products.context_processors.categories",
                 "carts.context_processors.cart",
+                "orders.context_processors.checkout_enabled",
             ],
         },
     },
