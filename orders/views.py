@@ -12,6 +12,7 @@ from customer_addresses.forms import AddressForm
 from customer_addresses.models import CustomerAddress
 from customers.views import CustomLoginView
 from orders.models import Order, OrderItem, ShippingMethod
+from django.http import HttpResponseRedirect
 
 
 class CheckoutLoginView(CustomLoginView):
@@ -24,16 +25,6 @@ class CheckoutView(CreateView):
     form_class = AddressForm
     template_name = "orders/checkout.html"
     success_url = reverse_lazy("home-view")
-
-    def _get_address_or_none(self, user) -> CustomerAddress | None:
-        try:
-            address = (
-                CustomerAddress.objects.filter(customer=user).order_by("-id").last()
-            )
-        except CustomerAddress.DoesNotExist:
-            address = None
-
-        return address
 
     def create_order(
         self,
@@ -75,15 +66,23 @@ class CheckoutView(CreateView):
     def form_valid(self, form):
         new_address = form.save(commit=False)
 
-        if self.request.user.is_authenticated:
-            new_address.customer = self.request.user
+        address_dct = {
+            "first_name": new_address.first_name,
+            "last_name": new_address.last_name,
+            "address_line": new_address.address_line,
+            "telephone": new_address.telephone,
+            "postal_code": new_address.postal_code,
+            "city": new_address.city,
+            "country": new_address.country,
+        }
 
-        new_address = CustomerAddress.objects.update_or_create(
-            defaults=new_address.__dict__, address_line=new_address.address_line
-        )[0]
-        # TODO - make it work
-        # - update
-        # - only 1 instance (now 2 new addresses created)
+        if self.request.user.is_authenticated:
+            new_address = CustomerAddress.objects.update_or_create(
+                defaults=address_dct, customer=self.request.user
+            )[0]
+
+        else:
+            new_address = CustomerAddress.objects.create(**address_dct, customer=None)
 
         shipping_method = form.cleaned_data.get("shipping_method")
         email = form.cleaned_data.get("email")
@@ -98,24 +97,51 @@ class CheckoutView(CreateView):
 
         self.create_order_items_from_cart(order)
 
-        return super().form_valid(form)
+        self.object = new_address
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_initial(self, *args, **kwargs):
         initial = super().get_initial()
 
-        if self.request.user.is_authenticated:
-            initial["email"] = self.request.user.email
+        if self.request.user.is_authenticated and not self.request.user.is_anonymous:
+            initial = self._populate_user_data(initial)
 
-            address = self._get_address_or_none(self.request.user)
+        return initial
 
-            if address:
-                initial["first_name"] = address.first_name
-                initial["last_name"] = address.last_name
-                initial["address_line"] = address.address_line
-                initial["telephone"] = address.telephone
-                initial["postal_code"] = address.postal_code
-                initial["city"] = address.city
-                initial["country"] = address.country
+    def _get_address_or_none(self, user) -> CustomerAddress | None:
+        try:
+            address = (
+                CustomerAddress.objects.filter(customer=user).order_by("-id").last()
+            )
+        except CustomerAddress.DoesNotExist:
+            address = None
+
+        return address
+
+    def _populate_user_data(self, initial):
+        initial["email"] = self.request.user.email
+
+        address = self._get_address_or_none(self.request.user)
+
+        if address:
+            initial = self._populate_address_data(initial, address)
+
+        return initial
+
+    def _populate_address_data(self, initial, address):
+        address_fields = [
+            "first_name",
+            "last_name",
+            "address_line",
+            "telephone",
+            "postal_code",
+            "city",
+            "country",
+        ]
+
+        for field in address_fields:
+            if hasattr(address, field):
+                initial[field] = getattr(address, field)
 
         return initial
 
