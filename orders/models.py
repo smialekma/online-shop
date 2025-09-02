@@ -8,9 +8,17 @@ from customer_addresses.models import CustomerAddress
 class ShippingMethod(models.Model):
     name = models.CharField()
     price = models.DecimalField(decimal_places=2, max_digits=5)
+    min_delivery_time_in_days = models.IntegerField()
+    max_delivery_time_in_days = models.IntegerField()
 
     def __str__(self):
         return self.name
+
+    def get_delivery_time_for_display(self) -> str:
+        if self.max_delivery_time_in_days == self.min_delivery_time_in_days:
+            return f"{self.min_delivery_time_in_days} day(s)"
+        else:
+            return f"{self.min_delivery_time_in_days} - {self.max_delivery_time_in_days} days"
 
 
 class Order(models.Model):
@@ -21,7 +29,7 @@ class Order(models.Model):
         blank=True,
         null=True,
     )
-    is_payed = models.BooleanField(default=False)
+    is_paid = models.BooleanField(default=False)
     date_ordered = models.DateTimeField(default=timezone.now)
     date_fulfilled = models.DateTimeField(blank=True, null=True)
     address = models.ForeignKey(
@@ -51,9 +59,12 @@ class OrderItem(models.Model):
     )
     product = models.ForeignKey(
         "products.Product",
-        related_name="orders",
+        related_name="order_items",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
     quantity = models.IntegerField()
+
+
+# Order.order_items.all() order_items -> product.

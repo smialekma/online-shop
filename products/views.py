@@ -40,7 +40,7 @@ class ProductView(ListView):
                 (
                     Product.objects.all()
                     .select_related("category")
-                    .annotate(count=Count("orders"))
+                    .annotate(count=Count("order_items"))
                 ).order_by("-count")
             ).prefetch_related(
                 Prefetch(

@@ -24,7 +24,7 @@ class CheckoutLoginView(CustomLoginView):
 class CheckoutView(CreateView):
     form_class = AddressForm
     template_name = "orders/checkout.html"
-    success_url = reverse_lazy("home-view")
+    success_url = reverse_lazy("stripe-view")
 
     def create_order(
         self,
@@ -98,7 +98,8 @@ class CheckoutView(CreateView):
         self.create_order_items_from_cart(order)
 
         self.object = new_address
-        return HttpResponseRedirect(self.get_success_url())
+        url = reverse_lazy("stripe-view", args=[order.id])
+        return HttpResponseRedirect(url)
 
     def get_initial(self, *args, **kwargs):
         initial = super().get_initial()

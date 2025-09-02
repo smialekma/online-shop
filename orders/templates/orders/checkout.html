@@ -105,6 +105,9 @@
                                                   data-price="{{ radio.choice_label.price|floatformat:2 }}"></span>
                                             {{ radio.choice_label.name }} ({{ radio.choice_label.price }})
                                         </label>
+                                        <div class="caption">
+                                            <p>{{ radio.choice_label.get_delivery_time_for_display }}</p>
+                                        </div>
                                     </div>
                                 {% endfor %}
                                 {% if form.shipping_method.errors %}

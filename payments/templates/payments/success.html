@@ -1,0 +1,33 @@
+{% include "dashboard/login_header.html" %}
+{% load static %}
+<!-- PAYMENT SUCCESS SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="login-container">
+            <div class="login-header" style="color: #FFF; text-align: center;">
+                <h2>Payment Successful</h2>
+            </div>
+            <div class="login-body" style="text-align: center; padding: 30px;">
+                <div style="font-size: 60px; color: #28a745; margin-bottom: 20px;">
+                    <i class="fa fa-check-circle"></i>
+                </div>
+                <h3>Thank you for your purchase!</h3>
+                <p>Your payment has been processed successfully.</p>
+                {% comment %}
+        <p>We’ve sent a confirmation email with your order details.</p>
+                {% endcomment %}
+                <div class="form-group" style="margin-top: 30px;">
+                    <a href="{% url "home-view" %}"
+                       class="primary-btn"
+                       style="width: 100%;
+                              margin-bottom: 15px">Continue Shopping</a>
+                    <a href="#" class="primary-btn" style="width: 100%;">View My Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /PAYMENT SUCCESS SECTION -->
+{% include "dashboard/footnote.html" %}
+</body>
+</html>
