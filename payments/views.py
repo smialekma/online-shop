@@ -107,16 +107,17 @@ def stripe_webhook(request):
     payload = request.body
     event = None
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
-    sig_header = request.META("HTTP_STRIPE_SIGNATURE")
+    sig_header = request.headers.get("stripe-signature")
 
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
-    except Exception:
+    except stripe.error.SignatureVerificationError as e:
+        print("⚠️  Webhook signature verification failed." + str(e))
         return HttpResponse(status=400)
 
     # Handle the event
-    if event["type"] == "checkout.session.completed":
-        session = event["data"]["object"]
+    if event.type == "checkout.session.completed":
+        session = event.data.object
         checkout_session_id = session.get("id")
         _handle_checkout_session_completed(checkout_session_id)
     else:
