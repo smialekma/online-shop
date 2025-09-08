@@ -13,5 +13,5 @@ class Payment(models.Model):
     )
     amount = models.DecimalField(decimal_places=2, max_digits=8)
     payment_method = models.CharField(null=True, blank=True)
-    status = models.CharField()
+    is_paid = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)

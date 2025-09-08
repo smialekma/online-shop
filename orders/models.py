@@ -29,7 +29,6 @@ class Order(models.Model):
         blank=True,
         null=True,
     )
-    is_paid = models.BooleanField(default=False)
     date_ordered = models.DateTimeField(default=timezone.now)
     date_fulfilled = models.DateTimeField(blank=True, null=True)
     address = models.ForeignKey(
@@ -51,6 +50,10 @@ class Order(models.Model):
         blank=True,
         null=True,
     )
+
+    @property
+    def is_paid(self):
+        return self.payments and self.payments.filter(is_paid=True).exists()
 
 
 class OrderItem(models.Model):
