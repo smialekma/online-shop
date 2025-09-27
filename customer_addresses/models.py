@@ -21,3 +21,6 @@ class CustomerAddress(models.Model):
 
     def __str__(self):
         return f"{self.address_line}"
+
+    def get_full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}"

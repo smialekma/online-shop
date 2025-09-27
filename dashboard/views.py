@@ -3,6 +3,8 @@ import random
 from django.db.models import Count, F
 from django.views.generic import TemplateView
 from django.db.models import Prefetch
+
+from orders.models import Order, OrderItem
 from products.models import Category, Product, ProductImage
 
 from carts.cart import Cart
@@ -118,3 +120,23 @@ class HomeView(TemplateView):
 
         context["cart"] = Cart(self.request)
         return context
+
+
+class AccountView(TemplateView):
+    template_name = "dashboard/account.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["total_orders"] = (
+            Order.objects.all()
+            .select_related("customer")
+            .filter(customer=self.request.user)
+            .count()
+        )
+        context["total_products"] = (
+            OrderItem.objects.all()
+            .select_related("order")
+            .filter(order__customer=self.request.user)
+            .count()
+        )

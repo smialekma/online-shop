@@ -1,4 +1,4 @@
-from django.db.models import Count, Prefetch, Avg
+from django.db.models import Count, Prefetch, Avg, QuerySet
 from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView
 from django.views.generic.detail import DetailView
@@ -12,6 +12,8 @@ from product_reviews.forms import ReviewForm
 
 from carts.cart import Cart
 from django.core.paginator import Paginator
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from typing import Optional, Any
 
 
 class ProductView(ListView):
@@ -22,7 +24,7 @@ class ProductView(ListView):
     ordering = ["date_added"]
     # paginate_by = 3
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
 
         f = ProductFilter(self.request.GET, queryset=Product.objects.all())
@@ -59,7 +61,9 @@ class ProductDetailView(CreateView, DetailView):
     template_name = "products/product_details.html"
     form_class = ReviewForm
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(
+        self, *, object_list: Optional[QuerySet[Product]] = None, **kwargs: Any
+    ) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
 
         product = self.get_object()
@@ -87,7 +91,7 @@ class ProductDetailView(CreateView, DetailView):
         context_data["form"] = ReviewForm()
         return context_data
 
-    def form_valid(self, form):
+    def form_valid(self, form: ReviewForm) -> HttpResponse:
         obj = form.save(commit=False)
         obj.author = self.request.user
         product = self.get_object()
@@ -95,11 +99,11 @@ class ProductDetailView(CreateView, DetailView):
         obj.save()
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return str(self.get_object().id)
 
 
-def add_product(request):
+def add_product(request: HttpRequest) -> HttpResponseRedirect:
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, id=product_id)
 
@@ -109,10 +113,10 @@ def add_product(request):
     return redirect("product-view")
 
 
-def remove_product(request):
+def remove_product(request: HttpRequest) -> HttpResponseRedirect:
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, id=product_id)
-    print(product.id)
+    # print(product.id)
 
     cart = Cart(request)
     cart.remove(product)

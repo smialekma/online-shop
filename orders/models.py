@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.utils import timezone
 
@@ -55,6 +57,12 @@ class Order(models.Model):
     def is_paid(self):
         return self.payments and self.payments.filter(is_paid=True).exists()
 
+    def get_status_for_display(self) -> str:
+        if self.is_paid:
+            return "Paid"
+        else:
+            return "Unpaid"
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(
@@ -68,6 +76,9 @@ class OrderItem(models.Model):
         null=True,
     )
     quantity = models.IntegerField()
+
+    def get_subtotal(self) -> Decimal:
+        return Decimal(self.quantity * self.product.price)
 
 
 # Order.order_items.all() order_items -> product.
