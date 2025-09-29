@@ -1,10 +1,10 @@
 import random
 
-from django.db.models import Count, F
+from django.db.models import Count, F, Sum
 from django.views.generic import TemplateView
 from django.db.models import Prefetch
 
-from orders.models import Order, OrderItem
+from orders.models import Order
 from products.models import Category, Product, ProductImage
 
 from carts.cart import Cart
@@ -128,15 +128,17 @@ class AccountView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["total_orders"] = (
-            Order.objects.all()
-            .select_related("customer")
-            .filter(customer=self.request.user)
-            .count()
-        )
-        context["total_products"] = (
-            OrderItem.objects.all()
-            .select_related("order")
-            .filter(order__customer=self.request.user)
-            .count()
-        )
+        orders = Order.objects.all().filter(customer=self.request.user)
+        orders_with_order_items = orders.prefetch_related("order_items")
+
+        context["total_orders"] = orders.count()
+        context["total_products"] = 0
+        context["total_price"] = orders.aggregate(Sum("total_amount"))[
+            "total_amount__sum"
+        ]
+
+        for order in orders_with_order_items:
+            for order_item in order.order_items.all():
+                context["total_products"] += order_item.quantity
+
+        return context
