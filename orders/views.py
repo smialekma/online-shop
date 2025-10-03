@@ -10,7 +10,7 @@ from django.views.generic import CreateView, ListView, DetailView
 from django_filters.views import FilterView
 
 from carts.cart import Cart
-from customer_addresses.forms import AddressForm
+from customer_addresses.forms import CheckoutForm
 from customer_addresses.models import CustomerAddress
 from customers.views import CustomLoginView
 from orders.filters import OrderFilter
@@ -28,7 +28,7 @@ class CheckoutLoginView(CustomLoginView):
 
 
 class CheckoutView(CreateView):
-    form_class = AddressForm
+    form_class = CheckoutForm
     template_name = "orders/checkout.html"
     success_url = reverse_lazy("stripe-view")
 

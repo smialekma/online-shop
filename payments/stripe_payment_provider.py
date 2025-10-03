@@ -2,8 +2,10 @@ from typing import List
 
 import stripe
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from stripe.checkout import Session
+from django.core.mail import EmailMessage
 
 from core import settings
 from orders.models import Order
@@ -100,6 +102,10 @@ class StripePaymentProvider:
         payment.is_paid = True
         payment.save()
 
+        self.order_id = payment.order.pk
+        email = payment.order.email
+        self._send_email(email)
+
         return payment
 
     def create_checkout_session(self) -> str:
@@ -151,3 +157,20 @@ class StripePaymentProvider:
             print("Unhandled event type {}".format(event.type))
 
         return HttpResponse(status=200)
+
+    def _send_email(self, email: str):
+        mail_subject = "Online Shop - you have placed an order"
+        message = render_to_string(
+            "payments/success_email.html",
+            {
+                "order_id": self.order_id,
+                "username": (
+                    self.request.user.username
+                    if self.request.user.is_authenticated
+                    else email
+                ),
+            },
+        )
+        to_email = email
+        email = EmailMessage(mail_subject, message, to=[to_email])
+        email.send()

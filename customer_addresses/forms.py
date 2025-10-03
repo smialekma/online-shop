@@ -8,6 +8,23 @@ from orders.models import ShippingMethod
 
 class AddressForm(forms.ModelForm):
     email = forms.EmailField(required=True)
+
+    class Meta:
+        model = CustomerAddress
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "address_line",
+            "telephone",
+            "telephone",
+            "postal_code",
+            "city",
+            "country",
+        ]
+
+
+class CheckoutForm(AddressForm):
     order_notes = forms.CharField(
         widget=forms.Textarea(attrs={"class": "input", "rows": 3}),
         required=False,

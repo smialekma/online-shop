@@ -1,0 +1,68 @@
+{% extends "dashboard/base.html" %}
+{% load crispy_forms_filters %}
+{% block content %}
+    <!-- BREADCRUMB -->
+    <div id="breadcrumb" class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="breadcrumb-header">Edit address</h3>
+                    <ul class="breadcrumb-tree">
+                        <li>
+                            <a href="{% url "home-view" %}">Home</a>
+                        </li>
+                        <li>
+                            <a href="{% url "account-view" %}">My account</a>
+                        </li>
+                        <li class="active">Edit address</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /row -->
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /BREADCRUMB -->
+    <!-- SECTION -->
+    <div class="section">
+        <!-- container -->
+        <div class="container">
+            <form method="post">
+                {% csrf_token %}
+                <!-- row -->
+                <div class="row">
+                    <div class="col-md-7">
+                        <!-- Billing Details -->
+                        <div class="billing-details">
+                            <div class="section-title">
+                                <h3 class="title">Shipping address</h3>
+                            </div>
+                            {% for field in form %}
+                                {% if field.name != 'shipping_method' and field.name != 'order_notes' and field.name != 'agree' %}
+                                    {{ field|as_crispy_field }}
+                                {% endif %}
+                            {% endfor %}
+                            {#                            <div class="input-checkbox">#}
+                            {#                                {{ form.agree }}#}
+                            {#                                <label for="{{ form.agree.id_for_label }}">#}
+                            {#                                    <span></span>#}
+                            {#                                I've read and accept the <a href="#" target="_blank">terms & conditions</a>*#}
+                            {#                                </label>#}
+                            {#                                {% if form.agree.errors %}#}
+                            {#                                  <div>{{ form.agree.errors }}</div>#}
+                            {#                                {% endif %}#}
+                            {#                            </div>#}
+                        </div>
+                    </div>
+                    <!-- /Billing Details -->
+                </div>
+                <!-- /row -->
+                <button type="submit" class="primary-btn order-submit">Save</button>
+            </form>
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /SECTION -->
+{% endblock %}
