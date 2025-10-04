@@ -12,6 +12,7 @@ from django_filters.views import FilterView
 from carts.cart import Cart
 from customer_addresses.forms import CheckoutForm
 from customer_addresses.models import CustomerAddress
+from customer_addresses.views import AddressFormMixin
 from customers.views import CustomLoginView
 from orders.filters import OrderFilter
 from orders.models import Order, OrderItem, ShippingMethod
@@ -27,7 +28,7 @@ class CheckoutLoginView(CustomLoginView):
     redirect_authenticated_user = True
 
 
-class CheckoutView(CreateView):
+class CheckoutView(AddressFormMixin, CreateView):
     form_class = CheckoutForm
     template_name = "orders/checkout.html"
     success_url = reverse_lazy("stripe-view")
@@ -70,25 +71,7 @@ class CheckoutView(CreateView):
 
     @transaction.atomic
     def form_valid(self, form):
-        new_address = form.save(commit=False)
-
-        address_dct = {
-            "first_name": new_address.first_name,
-            "last_name": new_address.last_name,
-            "address_line": new_address.address_line,
-            "telephone": new_address.telephone,
-            "postal_code": new_address.postal_code,
-            "city": new_address.city,
-            "country": new_address.country,
-        }
-
-        if self.request.user.is_authenticated:
-            new_address = CustomerAddress.objects.update_or_create(
-                defaults=address_dct, customer=self.request.user
-            )[0]
-
-        else:
-            new_address = CustomerAddress.objects.create(**address_dct, customer=None)
+        new_address = self.save_address(form)
 
         shipping_method = form.cleaned_data.get("shipping_method")
         email = form.cleaned_data.get("email")
@@ -103,7 +86,6 @@ class CheckoutView(CreateView):
 
         self.create_order_items_from_cart(order)
 
-        self.object = new_address
         url = reverse_lazy("stripe-view", args=[order.id])
         return HttpResponseRedirect(url)
 
@@ -112,43 +94,6 @@ class CheckoutView(CreateView):
 
         if self.request.user.is_authenticated and not self.request.user.is_anonymous:
             initial = self._populate_user_data(initial)
-
-        return initial
-
-    def _get_address_or_none(self, user) -> CustomerAddress | None:
-        try:
-            address = (
-                CustomerAddress.objects.filter(customer=user).order_by("-id").last()
-            )
-        except CustomerAddress.DoesNotExist:
-            address = None
-
-        return address
-
-    def _populate_user_data(self, initial):
-        initial["email"] = self.request.user.email
-
-        address = self._get_address_or_none(self.request.user)
-
-        if address:
-            initial = self._populate_address_data(initial, address)
-
-        return initial
-
-    def _populate_address_data(self, initial, address):
-        address_fields = [
-            "first_name",
-            "last_name",
-            "address_line",
-            "telephone",
-            "postal_code",
-            "city",
-            "country",
-        ]
-
-        for field in address_fields:
-            if hasattr(address, field):
-                initial[field] = getattr(address, field)
 
         return initial
 

@@ -9,14 +9,9 @@ from customer_addresses.forms import AddressForm
 from customer_addresses.models import CustomerAddress
 
 
-class EditAddressView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
-    model = CustomerAddress
-    template_name = "customer_addresses/edit_address.html"
-    form_class = AddressForm
-    success_message = "The address has been successfully saved."
-    success_url = reverse_lazy("account-view")
+class AddressFormMixin:
 
-    def form_valid(self, form: AddressForm) -> HttpResponseRedirect:
+    def save_address(self, form: AddressForm) -> CustomerAddress:
         new_address = form.save(commit=False)
 
         address_dct = {
@@ -29,24 +24,17 @@ class EditAddressView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
             "country": new_address.country,
         }
 
-        new_address = CustomerAddress.objects.update_or_create(
-            defaults=address_dct, customer=self.request.user
-        )[0]
+        if self.request.user.is_authenticated:
+            new_address = CustomerAddress.objects.update_or_create(
+                defaults=address_dct, customer=self.request.user
+            )[0]
 
-        # super().form_valid()
+        else:
+            new_address = CustomerAddress.objects.create(**address_dct, customer=None)
+
         self.object = new_address
-        success_message = self.get_success_message(form.cleaned_data)
-        if success_message:
-            messages.success(self.request, success_message)
-        url = reverse_lazy("account-view")
-        return HttpResponseRedirect(url)
 
-    def get_initial(self, *args, **kwargs):
-        initial = super().get_initial()
-
-        initial = self._populate_user_data(initial)
-
-        return initial
+        return new_address
 
     def _get_address_or_none(self) -> CustomerAddress | None:
         try:
@@ -84,5 +72,30 @@ class EditAddressView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
         for field in address_fields:
             if hasattr(address, field):
                 initial[field] = getattr(address, field)
+
+        return initial
+
+
+class EditAddressView(
+    AddressFormMixin, SuccessMessageMixin, LoginRequiredMixin, CreateView
+):
+    model = CustomerAddress
+    template_name = "customer_addresses/edit_address.html"
+    form_class = AddressForm
+    success_message = "The address has been successfully saved."
+    success_url = reverse_lazy("account-view")
+
+    def form_valid(self, form: AddressForm) -> HttpResponseRedirect:
+        self.save_address(form)
+        success_message = self.get_success_message(form.cleaned_data)
+        if success_message:
+            messages.success(self.request, success_message)
+        url = reverse_lazy("account-view")
+        return HttpResponseRedirect(url)
+
+    def get_initial(self, *args, **kwargs):
+        initial = super().get_initial()
+
+        initial = self._populate_user_data(initial)
 
         return initial

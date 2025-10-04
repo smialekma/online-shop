@@ -95,7 +95,9 @@ class StripePaymentProvider:
         payment.payment_method = payment_method_type
         payment.save()
 
-    def _handle_checkout_session_completed(self, checkout_session_id: str) -> Payment:
+    def _handle_checkout_session_completed(
+        self, checkout_session_id: str, username: str
+    ) -> Payment:
         payment = Payment.objects.select_related("order").get(
             stripe_checkout_id=checkout_session_id
         )
@@ -104,7 +106,8 @@ class StripePaymentProvider:
 
         self.order_id = payment.order.pk
         email = payment.order.email
-        self._send_email(email)
+
+        self._send_email(email, username)
 
         return payment
 
@@ -126,6 +129,13 @@ class StripePaymentProvider:
             cancel_url=self.request.build_absolute_uri(
                 reverse_lazy("stripe-cancel-view")
             ),
+            metadata={
+                "username": (
+                    self.request.user.username
+                    if self.request.user.is_authenticated
+                    else None
+                )
+            },
         )
 
         # create new payment object
@@ -148,7 +158,11 @@ class StripePaymentProvider:
         if event.type == "checkout.session.completed":
             session = event.data.object
             checkout_session_id = session.get("id")
-            payment = self._handle_checkout_session_completed(checkout_session_id)
+            username = session.get("metadata", {}).get("username")
+
+            payment = self._handle_checkout_session_completed(
+                checkout_session_id, username=username
+            )
 
             payment_intent_id = session.get("payment_intent")
             self._handle_payment_intent_succeeded(payment_intent_id, payment)
@@ -158,19 +172,15 @@ class StripePaymentProvider:
 
         return HttpResponse(status=200)
 
-    def _send_email(self, email: str):
+    def _send_email(self, to_email: str, username: str) -> None:
+
         mail_subject = "Online Shop - you have placed an order"
         message = render_to_string(
             "payments/success_email.html",
             {
                 "order_id": self.order_id,
-                "username": (
-                    self.request.user.username
-                    if self.request.user.is_authenticated
-                    else email
-                ),
+                "username": (username if username else to_email),
             },
         )
-        to_email = email
         email = EmailMessage(mail_subject, message, to=[to_email])
         email.send()
