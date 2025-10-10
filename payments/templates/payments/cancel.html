@@ -1,0 +1,32 @@
+{% include "dashboard/login_header.html" %}
+{% load static %}
+<!-- PAYMENT CANCEL SECTION -->
+<div class="section">
+    <div class="container">
+        <div class="login-container">
+            <div class="login-header" style="color: #FFF; text-align: center;">
+                <h2>Payment Cancelled</h2>
+            </div>
+            <div class="login-body" style="text-align: center; padding: 30px;">
+                <div style="font-size: 60px; color: #D10024; margin-bottom: 20px;">
+                    <i class="fa fa-times-circle"></i>
+                </div>
+                <h3>Your payment was not completed</h3>
+                <p>It looks like the payment process was cancelled or interrupted.</p>
+                <p>You can try again or choose another payment method.</p>
+                <div class="form-group" style="margin-top: 30px;">
+                    <a href="#"
+                       class="primary-btn"
+                       style="width: 100%;
+                              margin-bottom: 15px;
+                              background-color: #D10024">Try Again</a>
+                    <a href="{% url 'home-view' %}" class="primary-btn" style="width: 100%;">Back to Shop</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /PAYMENT CANCEL SECTION -->
+{% include "dashboard/footnote.html" %}
+</body>
+</html>

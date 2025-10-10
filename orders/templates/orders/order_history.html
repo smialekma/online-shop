@@ -1,0 +1,110 @@
+{% extends "dashboard/base.html" %}
+{% load crispy_forms_filters %}
+{% block content %}
+    <!-- Breadcrumb -->
+    <div id="breadcrumb">
+        <div class="container">
+            <h3 class="breadcrumb-header">Order History</h3>
+            <ul class="breadcrumb-tree">
+                <li>
+                    <a href="{% url "home-view" %}">Home</a>
+                </li>
+                <li>
+                    <a href="{% url "account-view" %}">My account</a>
+                </li>
+                <li class="active">Order History</li>
+            </ul>
+        </div>
+    </div>
+    <!-- Section -->
+    <div class="section">
+        <div class="container">
+            <!-- Filter & Search -->
+            <div class="store-filter clearfix"
+                 style="margin-bottom: 25px;
+                        padding: 15px;
+                        border: 1px solid #E4E7ED;
+                        background: #FBFBFC">
+                <form method="get" action="">
+                    <div class="store-sort">
+                        <label for="status">Filter by Status:</label>
+                        {{ filter.form.status|as_crispy_field }}
+                    </div>
+                    <div class="store-sort" style="margin-left: 20px;">
+                        <label for="search">Search by Product Name:</label>
+                        {{ filter.form.search|as_crispy_field }}
+                    </div>
+                    <div class="store-sort" style="margin-left: 20px;">
+                        <label for="order_by">Sort by:</label>
+                        {{ filter.form.order_by|as_crispy_field }}
+                    </div>
+                    <div class="store-sort" style="margin-left: 20px;">
+                        <button type="submit" class="filter-btn">Apply</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Order Table -->
+            <div class="order-details">
+                <table style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #E4E7ED;">
+                            <th style="padding: 10px; text-align:left;">Date</th>
+                            <th style="padding: 10px; text-align:left;">Items</th>
+                            <th style="padding: 10px; text-align:left;">Total</th>
+                            <th style="padding: 10px; text-align:left;">Status</th>
+                            <th style="padding: 10px; text-align:left;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr style="border-bottom: 1px solid #E4E7ED;">
+                                <td style="padding: 10px;">{{ order.created_at|date:"d-m-Y" }}</td>
+                                <td style="padding: 10px;">
+                                    {% for item in order.order_items.all %}
+                                        {{ item.product.name }} (x{{ item.quantity }})
+                                        <br>
+                                    {% endfor %}
+                                </td>
+                                <td style="padding: 10px; color:#D10024;">{{ order.total_amount }}</td>
+                                <td style="padding: 10px;">{{ order.get_status_for_display }}</td>
+                                <td style="padding: 10px;">
+                                    <a href="{% url "order-detail-view" order.id %}"
+                                       class="primary-btn"
+                                       style="padding:6px 15px">View</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" style="padding: 20px; text-align:center; color:#8D99AE;">No orders found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div class="store-filter clearfix">
+                {% if page_obj.has_other_pages %}
+                    <ul class="store-pagination">
+                        {% if page_obj.has_previous %}
+                            <li>
+                                <a href="{% querystring page=page_obj.previous_page_number %}"><i class="fa fa-angle-left"></i></a>
+                            </li>
+                            <li>
+                                <a href="{% querystring page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                            </li>
+                        {% endif %}
+                        <li class="active">{{ page_obj.number }}</li>
+                        {% if page_obj.has_next %}
+                            <li>
+                                <a href="{% querystring page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                            </li>
+                            <li>
+                                <a href="{% querystring page=page_obj.next_page_number %}"><i class="fa fa-angle-right"></i></a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

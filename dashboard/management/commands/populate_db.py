@@ -1,3 +1,4 @@
+from typing import Any
 import random
 
 from django.core.management.base import BaseCommand
@@ -22,7 +23,7 @@ from products.models import Product, ProductImage, Category, Brand
 class Command(BaseCommand):
     help = "Populate the database with fake data for all models"
 
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Any) -> None:
         self.stdout.write("Starting database population...")
 
         # create brand and categories
@@ -70,23 +71,25 @@ class Command(BaseCommand):
         for _ in range(number):
             brand = random.choice(brands)
             category = random.choice(categories)
-            product = ProductFactory(brand=brand, category=category)
+            product = ProductFactory.create(
+                brand=brand, category=category
+            )  # TODO To Check if still working
             self.create_product_images(product, 3)
             products.append(product)
 
         return products
 
     def create_address(self) -> CustomerAddress:
-        return CustomerAddressFactory()
+        return CustomerAddressFactory.create()
 
     def create_order(self, address: CustomerAddress, customer: Customer) -> Order:
-        return OrderFactory(address=address, customer=customer)
+        return OrderFactory.create(address=address, customer=customer)
 
     def create_order_item(self, order: Order, product: Product) -> OrderItem:
-        return OrderItemFactory(order=order, product=product)
+        return OrderItemFactory.create(order=order, product=product)
 
     def create_review(self, customer: Customer, product: Product) -> Review:
-        return ReviewFactory(author=customer, product=product)
+        return ReviewFactory.create(author=customer, product=product)
 
     def create_customers(
         self,
@@ -100,7 +103,7 @@ class Command(BaseCommand):
 
         for _ in range(num_of_customers):
             address = self.create_address()
-            customer = CustomerFactory(address=address)
+            customer = CustomerFactory.create(address=address)
 
             customers.append(customer)
 

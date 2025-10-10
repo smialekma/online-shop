@@ -56,3 +56,4 @@ class OrderItemFactory(factory.django.DjangoModelFactory):
 
     order = factory.SubFactory(OrderFactory)
     product = factory.SubFactory(ProductFactory)
+    quantity = factory.Faker("random_int", min=1, max=5)

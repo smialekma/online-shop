@@ -14,5 +14,5 @@ class CustomerAddressFactory(factory.django.DjangoModelFactory):
 
     telephone = factory.Faker("phone_number")
     city = factory.Faker("city")
-    zip_code = factory.Faker("postcode")
+    postal_code = factory.Faker("postcode")
     country = factory.Faker("country")

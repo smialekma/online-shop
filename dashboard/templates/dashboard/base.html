@@ -170,8 +170,13 @@
                                             <h5>SUBTOTAL: {{ cart.get_total_price }}</h5>
                                         </div>
                                         <div class="cart-btns">
-                                            <a href="#">View Cart</a>
-                                            <a href="#">Checkout  <i class="fa fa-arrow-circle-right"></i></a>
+                                            {% if checkout_enabled %}
+                                                <a href="#">View Cart</a>
+                                                <a href="{% url "checkout-login" %}">Checkout  <i class="fa fa-arrow-circle-right"></i></a>
+                                            {% else %}
+                                                <a href="#" class="disabled">View Cart</a>
+                                                <a href="{% url "checkout-login" %}" class="disabled">Checkout  <i class="fa fa-arrow-circle-right"></i></a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

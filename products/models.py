@@ -2,6 +2,7 @@ from django.db import models
 from PIL import Image
 from django.db.models import Count
 from django.utils import timezone
+from typing import Any
 
 from orders.models import OrderItem
 
@@ -32,7 +33,9 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=30, help_text="name of the product")
+    name: str | models.CharField = models.CharField(
+        max_length=30, help_text="name of the product"
+    )
     brand = models.ForeignKey(Brand, related_name="products", on_delete=models.CASCADE)
     description = models.TextField()
     details = models.TextField()
@@ -89,13 +92,13 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    photo = models.ImageField(upload_to="product_pics")
-    is_main_photo = models.BooleanField(default=False)
-    product = models.ForeignKey(
+    photo = models.ImageField(upload_to="product_pics")  # type: ignore
+    is_main_photo: bool | models.BooleanField = models.BooleanField(default=False)
+    product: models.ForeignKey = models.ForeignKey(
         Product, related_name="images", on_delete=models.CASCADE
     )
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: Any, **kwargs: Any) -> None:
         super().save(*args, **kwargs)
 
         img = Image.open(self.photo.path)

@@ -75,6 +75,11 @@ a {
   transition: 0.2s color;
 }
 
+a.disabled {
+  pointer-events: none;
+  cursor: default;
+}
+
 a:hover, a:focus {
   color: #D10024;
   text-decoration: none;
@@ -198,9 +203,14 @@ textarea.input {
 }
 
 .input-radio input[type="radio"]:not(:checked), .input-radio input[type="radio"]:checked, .input-checkbox input[type="checkbox"]:not(:checked), .input-checkbox input[type="checkbox"]:checked {
-  position: absolute;
-  margin-left: -9999px;
-  visibility: hidden;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
+  visibility: visible;
 }
 
 .input-radio label, .input-checkbox label {
@@ -608,6 +618,10 @@ textarea.input {
 
 .cart-dropdown .cart-btns>a:hover {
   opacity: 0.9;
+}
+
+.cart-dropdown .cart-btns>a.disabled {
+  background-color: #8c8c8c;
 }
 
 .cart-dropdown .cart-summary {

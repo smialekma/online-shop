@@ -1,0 +1,55 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+    <!-- Breadcrumb -->
+    <div id="breadcrumb">
+        <div class="container">
+            <h3 class="breadcrumb-header">My account</h3>
+            <ul class="breadcrumb-tree">
+                <li>
+                    <a href="{% url "home-view" %}">Home</a>
+                </li>
+                <li class="active">My account</li>
+            </ul>
+        </div>
+    </div>
+    <!-- /Breadcrumb -->
+    <!-- My Account Section -->
+    <div class="section">
+        <div class="container">
+            <div class="section-title">
+                <h3 class="title">Summary</h3>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>
+                        <strong>Hello, {{ user.username }}!</strong>
+                    </p>
+                    <p>
+                        Total products ordered:
+                        <span style="color:#D10024; font-weight:700;">{{ total_products }}</span>
+                    </p>
+                    <p>
+                        Total orders:
+                        <span style="color:#D10024; font-weight:700;">{{ total_orders }}</span>
+                    </p>
+                    <p>
+                        Total money spent:
+                        <span style="color:#D10024; font-weight:700;">{{ total_price }}</span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h4>Shortcuts</h4>
+                    <ul class="footer-links">
+                        <li>
+                            <a href="{% url "edit-address-view" %}"><i class="fa fa-map-marker"></i> Edit your address</a>
+                        </li>
+                        <li>
+                            <a href="{% url "order-history-view" %}"><i class="fa fa-shopping-bag"></i> Order History</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /My Account Section -->
+{% endblock %}

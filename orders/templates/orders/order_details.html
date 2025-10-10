@@ -1,0 +1,150 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block content %}
+    <!-- BREADCRUMB -->
+    <div id="breadcrumb" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="breadcrumb-header">Order #{{ order.id }}</h3>
+                    <ul class="breadcrumb-tree">
+                        <li>
+                            <a href="{% url "home-view" %}">Home</a>
+                        </li>
+                        <li>
+                            <a href="{% url "order-history-view" %}">Order History</a>
+                        </li>
+                        <li class="active">Order #{{ order.id }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /BREADCRUMB -->
+    <!-- SECTION -->
+    <div class="section">
+        <div class="container">
+            <div class="row">
+                <!-- Order Items (larger column) -->
+                <div class="col-md-7 order-details">
+                    <div class="section-title text-center">
+                        <h3 class="title">Your Items</h3>
+                    </div>
+                    <div class="order-summary">
+                        <div class="order-col">
+                            <div>
+                                <strong>PRODUCT</strong>
+                            </div>
+                            <div>
+                                <strong>SUBTOTAL</strong>
+                            </div>
+                        </div>
+                        <div class="order-products">
+                            {% for item in items %}
+                                <div class="order-col"
+                                     style="display: flex;
+                                            align-items: center;
+                                            gap: 15px;
+                                            padding: 10px 0;
+                                            border-bottom: 1px solid #E4E7ED">
+                                    <div style="width: 70px; flex-shrink: 0;">
+                                        {% for photo in main_images %}
+                                            {% if photo.product == item.product %}
+                                                <img src="{{ photo.photo.url }}"
+                                                     alt="{{ item.product.name }}"
+                                                     style="width: 100%;
+                                                            border: 1px solid #E4E7ED;
+                                                            border-radius: 6px">
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div style="flex-grow: 1;">
+                                        <strong>{{ item.product.name }}</strong>
+                                        <br>
+                                        Quantity: {{ item.quantity }} × {{ item.product.price }}
+                                    </div>
+                                    <div style="font-weight: 600; color: #D10024;">{{ item.get_subtotal }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <!-- Shipping Row -->
+                        <div class="order-col"
+                             style="border-top: 1px solid #E4E7ED;
+                                    padding-top: 10px">
+                            <div>Shipping ({{ order.shipping_method.name }})</div>
+                            <div>
+                                <strong>{{ order.shipping_method.price }}</strong>
+                            </div>
+                        </div>
+                        <!-- Total -->
+                        <div class="order-col" style="margin-top: 15px;">
+                            <div>
+                                <strong>TOTAL</strong>
+                            </div>
+                            <div>
+                                <strong class="order-total">{{ order.total_amount }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <a href="{% url "order-history-view" %}" class="primary-btn">← Back to Order History</a>
+                    </div>
+                </div>
+                <!-- /Order Items -->
+                <!-- Shipping & Customer Details (smaller column) -->
+                <div class="col-md-5">
+                    <div class="billing-details">
+                        <div class="section-title">
+                            <h3 class="title">Shipping Address</h3>
+                        </div>
+                        <p>
+                            <strong>Name:</strong> {{ order.address.get_full_name }}
+                        </p>
+                        <p>
+                            <strong>Email:</strong> {{ order.customer.email }}
+                        </p>
+                        <p>
+                            <strong>Address:</strong> {{ order.address.address_line }}
+                        </p>
+                        <p>
+                            <strong>Postal code:</strong> {{ order.address.postal_code }}
+                        </p>
+                        <p>
+                            <strong>City:</strong> {{ order.address.city }}
+                        </p>
+                        <p>
+                            <strong>Country:</strong> {{ order.address.country }}
+                        </p>
+                        <p>
+                            <strong>Phone number:</strong> {{ order.address.telephone }}
+                        </p>
+                    </div>
+                    <!-- Order Info -->
+                    <div class="billing-details">
+                        <div class="section-title">
+                            <h3 class="title">Order Details</h3>
+                        </div>
+                        <p>
+                            <strong>Order date:</strong> {{ order.created_at|date:"Y-m-d H:i" }}
+                        </p>
+                        <p>
+                            <strong>Order status:</strong> {{ order.get_status_for_display }}
+                        </p>
+                        {% if payment.payment_method %}
+                            <p>
+                                <strong>Payment Method:</strong> {{ payment.payment_method }}
+                            </p>
+                        {% endif %}
+                        {% if order.order_notes %}
+                            <p>
+                                <strong>Order notes:</strong> {{ order.order_notes }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- /Shipping & Customer Details -->
+            </div>
+        </div>
+    </div>
+    <!-- /SECTION -->
+{% endblock %}

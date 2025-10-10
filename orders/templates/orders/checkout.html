@@ -1,0 +1,155 @@
+{% extends "dashboard/base.html" %}
+{% load crispy_forms_filters %}
+{% block content %}
+    <!-- BREADCRUMB -->
+    <div id="breadcrumb" class="section">
+        <!-- container -->
+        <div class="container">
+            <!-- row -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="breadcrumb-header">Checkout</h3>
+                    <ul class="breadcrumb-tree">
+                        <li>
+                            <a href="#">Home</a>
+                        </li>
+                        <li class="active">Checkout</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /row -->
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /BREADCRUMB -->
+    <!-- SECTION -->
+    <div class="section">
+        <!-- container -->
+        <div class="container">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <!-- row -->
+                <div class="row">
+                    <div class="col-md-7">
+                        <!-- Billing Details -->
+                        <div class="billing-details">
+                            <div class="section-title">
+                                <h3 class="title">Shipping address</h3>
+                            </div>
+                            {% for field in form %}
+                                {% if field.name != 'shipping_method' %}{{ field|as_crispy_field }}{% endif %}
+                            {% endfor %}
+                            {#                            <div class="input-checkbox">#}
+                            {#                                {{ form.agree }}#}
+                            {#                                <label for="{{ form.agree.id_for_label }}">#}
+                            {#                                    <span></span>#}
+                            {#                                I've read and accept the <a href="#" target="_blank">terms & conditions</a>*#}
+                            {#                                </label>#}
+                            {#                                {% if form.agree.errors %}#}
+                            {#                                  <div>{{ form.agree.errors }}</div>#}
+                            {#                                {% endif %}#}
+                            {#                            </div>#}
+                        </div>
+                    </div>
+                    <!-- /Billing Details -->
+                    <!-- Order Details -->
+                    <div class="col-md-5 order-details">
+                        <div class="section-title text-center">
+                            <h3 class="title">Your Order</h3>
+                        </div>
+                        <div class="order-summary">
+                            <div class="order-col">
+                                <div>
+                                    <strong>PRODUCT</strong>
+                                </div>
+                                <div>
+                                    <strong>TOTAL</strong>
+                                </div>
+                            </div>
+                            <div class="order-products">
+                                {% for cart_item in cart %}
+                                    <div class="order-col">
+                                        <div>{{ cart_item.quantity }}x {{ cart_item.product.name }}</div>
+                                        <div>{{ cart_item.total_price }}</div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="order-col">
+                                <div>Shipping</div>
+                                <div>
+                                    <strong id="shipping-cost">–</strong>
+                                </div>
+                            </div>
+                            <div class="order-col">
+                                <div>
+                                    <strong>TOTAL</strong>
+                                </div>
+                                <div>
+                                    <strong class="order-total"
+                                            id="order-total"
+                                            data-cart-total="{{ cart.get_total_price|floatformat:2 }}">
+                                        {{ cart.get_total_price }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shipping-methods">
+                            <h4>Shipping Method</h4>
+                            <div id="shipping-method-options">
+                                {% for radio in form.shipping_method %}
+                                    <div class="input-radio">
+                                        {{ radio.tag }}
+                                        <label for="{{ radio.id_for_label }}" style="display: inline-block;">
+                                            <span class="shipping-price"
+                                                  data-price="{{ radio.choice_label.price|floatformat:2 }}"></span>
+                                            {{ radio.choice_label.name }} ({{ radio.choice_label.price }})
+                                        </label>
+                                        <div class="caption">
+                                            <p>{{ radio.choice_label.get_delivery_time_for_display }}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                {% if form.shipping_method.errors %}
+                                    <div class="text-danger" style="color: red;">{{ form.shipping_method.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <button type="submit" class="primary-btn order-submit">Place order</button>
+                    </div>
+                    <!-- /Order Details -->
+                </div>
+                <!-- /row -->
+            </form>
+        </div>
+        <!-- /container -->
+    </div>
+    <!-- /SECTION -->
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const shippingOptions = document.querySelectorAll('input[name="shipping_method"]');
+    const shippingCostElement = document.getElementById('shipping-cost');
+    const orderTotalElement = document.getElementById('order-total');
+    const cartTotal = parseFloat(orderTotalElement.dataset.cartTotal);
+
+    function updateShippingCost() {
+        const selected = document.querySelector('input[name="shipping_method"]:checked');
+        if (selected) {
+            const priceLabel = selected.closest('.input-radio').querySelector('.shipping-price');
+            if (priceLabel) {
+                const shippingPrice = parseFloat(priceLabel.dataset.price.replace(',', '.'));
+                shippingCostElement.textContent = shippingPrice.toFixed(2);
+                const totalWithShipping = (cartTotal + shippingPrice).toFixed(2);
+                orderTotalElement.textContent = totalWithShipping;
+            }
+        }
+    }
+
+    shippingOptions.forEach(option => {
+        option.addEventListener('change', updateShippingCost);
+    });
+
+    updateShippingCost();
+});
+    </script>
+{% endblock %}
