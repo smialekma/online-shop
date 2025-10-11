@@ -1,14 +1,19 @@
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, Avg, QuerySet
 from django.shortcuts import get_object_or_404
+from django.views.generic import CreateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from product_reviews.models import Review
 from .filters import ProductFilter
 from .models import Product, ProductImage
 from django.shortcuts import redirect
+from product_reviews.forms import ReviewForm
 
 from carts.cart import Cart
 from django.core.paginator import Paginator
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from typing import Optional, Any
 
 
 class ProductView(ListView):
@@ -19,7 +24,7 @@ class ProductView(ListView):
     ordering = ["date_added"]
     # paginate_by = 3
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
 
         f = ProductFilter(self.request.GET, queryset=Product.objects.all())
@@ -37,7 +42,7 @@ class ProductView(ListView):
                 (
                     Product.objects.all()
                     .select_related("category")
-                    .annotate(count=Count("orders"))
+                    .annotate(count=Count("order_items"))
                 ).order_by("-count")
             ).prefetch_related(
                 Prefetch(
@@ -51,22 +56,54 @@ class ProductView(ListView):
         return context_data
 
 
-class ProductDetailView(DetailView):
+class ProductDetailView(CreateView, DetailView):
     model = Product
     template_name = "products/product_details.html"
+    form_class = ReviewForm
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(
+        self, *, object_list: Optional[QuerySet[Product]] = None, **kwargs: Any
+    ) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
 
         product = self.get_object()
         context_data["product"] = product
+        reviews = (
+            Review.objects.filter(product_id=product.id)
+            .select_related("author")
+            .order_by("-created_at")
+        )
+
+        paginator = Paginator(reviews, 3)
+        page_number = self.request.GET.get("page", 1)
+        page_obj = paginator.get_page(page_number)
+        context_data["page_obj"] = page_obj
+        context_data["paginator"] = paginator
+
+        review_aggregations = reviews.aggregate(
+            average_rating=Avg("rating"), review_count=Count("id")
+        )
+        context_data["review_aggregations"] = review_aggregations
+        context_data["reviews"] = page_obj
+        context_data["rating_options"] = (1, 2, 3, 4, 5)
 
         context_data["related_products"] = product.get_related_products(limit=5)
-        print(context_data)
+        context_data["form"] = ReviewForm()
         return context_data
 
+    def form_valid(self, form: ReviewForm) -> HttpResponse:
+        obj = form.save(commit=False)
+        obj.author = self.request.user
+        product = self.get_object()
+        obj.product = product
+        obj.save()
+        return super().form_valid(form)
 
-def add_product(request):
+    def get_success_url(self) -> str:
+        return str(self.get_object().id)
+
+
+def add_product(request: HttpRequest) -> HttpResponseRedirect:
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, id=product_id)
 
@@ -76,10 +113,10 @@ def add_product(request):
     return redirect("product-view")
 
 
-def remove_product(request):
+def remove_product(request: HttpRequest) -> HttpResponseRedirect:
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, id=product_id)
-    print(product.id)
+    # print(product.id)
 
     cart = Cart(request)
     cart.remove(product)

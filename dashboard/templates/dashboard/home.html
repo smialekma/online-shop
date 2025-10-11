@@ -19,7 +19,8 @@
                                     <br>
                                     Collection
                                 </h3>
-                                <a href="#" class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
+                                <a href="{% url "product-view" %}?category={{ category.id }}"
+                                   class="cta-btn">Shop now <i class="fa fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -89,7 +90,7 @@
                                                         <div class="product-body">
                                                             <p class="product-category">{{ category.name }}</p>
                                                             <h3 class="product-name">
-                                                                <a href="#">{{ product.name }}</a>
+                                                                <a href="{% url "detail-view" product.id %}">{{ product.name }}</a>
                                                             </h3>
                                                             {% if product.is_sale %}
                                                                 <h4 class="product-price">
@@ -199,7 +200,7 @@
                                                             <div class="product-body">
                                                                 <p class="product-category">{{ category.name }}</p>
                                                                 <h3 class="product-name">
-                                                                    <a href="#">{{ product.name }}</a>
+                                                                    <a href="{% url "detail-view" product.id %}">{{ product.name }}</a>
                                                                 </h3>
                                                                 {% if product.is_sale %}
                                                                     <h4 class="product-price">
@@ -277,7 +278,7 @@
                                             <div class="product-body">
                                                 <p class="product-category">{{ product.category }}</p>
                                                 <h3 class="product-name">
-                                                    <a href="#">{{ product.name }}</a>
+                                                    <a href="{% url "detail-view" product.id %}">{{ product.name }}</a>
                                                 </h3>
                                                 {% if product.is_sale %}
                                                     <h4 class="product-price">
@@ -317,7 +318,7 @@
                                             <div class="product-body">
                                                 <p class="product-category">{{ product.category }}</p>
                                                 <h3 class="product-name">
-                                                    <a href="#">{{ product.name }}</a>
+                                                    <a href="{% url "detail-view" product.id %}">{{ product.name }}</a>
                                                 </h3>
                                                 {% if product.is_sale %}
                                                     <h4 class="product-price">
@@ -358,7 +359,7 @@
                                             <div class="product-body">
                                                 <p class="product-category">{{ product.category }}</p>
                                                 <h3 class="product-name">
-                                                    <a href="#">{{ product.name }}</a>
+                                                    <a href="{% url "detail-view" product.id %}">{{ product.name }}</a>
                                                 </h3>
                                                 <h4 class="product-price">
                                                     {{ product.price }} <del class="product-old-price">{{ product.old_price }}</del>

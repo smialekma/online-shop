@@ -5,6 +5,7 @@ from .views import (
     CustomLogoutView,
     ResetPasswordView,
     CustomPasswordResetConfirmView,
+    activate,
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
         CustomPasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
+    path("activate/<uidb64>/<token>", activate, name="activate-view"),
 ]

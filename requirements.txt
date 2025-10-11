@@ -34,3 +34,7 @@ sqlparse==0.5.3
 tqdm==4.67.1
 tzdata==2025.1
 virtualenv==20.29.3
+
+factory_boy~=3.3.3
+
+stripe~=12.4.0
