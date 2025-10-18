@@ -4,8 +4,7 @@ on:
     workflows: ["Lint"]
     types:
       - completed
-    branches:
-      - [ main ]
+    branches: [ main ]
 
 env:
   PYTHON_VERSION: '3.13'
