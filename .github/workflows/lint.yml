@@ -50,7 +50,7 @@ jobs:
         continue-on-error: true
 
       - name: Run bandit
-        run: poetry run bandit -r . -
+        run: poetry run bandit -r .
 
       - name: Check dependencies with safety
         run: poetry run safety check
