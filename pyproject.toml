@@ -1,5 +1,6 @@
 [tool.bandit]
 skips = ["B101", "B311", "B308"]
+exclude_dirs = ['.venv', 'tests']
 
 [tool.mypy]
 python_version = "3.13"
