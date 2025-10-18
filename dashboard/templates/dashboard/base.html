@@ -64,6 +64,11 @@
                             <li>
                                 <a href="#"><i class="fa fa-user-o"></i> My Account</a>
                             </li>
+                            {% if user.is_manager or user.is_superuser %}
+                                <li>
+                                    <a href="{% url "management-view" %}"><i class="fa fa-address-book"></i> Admin Panel</a>
+                                </li>
+                            {% endif %}
                             <li>
                                 <form action="{% url "logout-view" %}" method="post">
                                     {% csrf_token %}

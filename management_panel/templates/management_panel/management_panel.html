@@ -1,0 +1,185 @@
+{% load static %}
+{% include "dashboard/login_header.html" %}
+<!-- Breadcrumb -->
+<div id="breadcrumb">
+    <div class="container">
+        <h3 class="breadcrumb-header">Admin panel</h3>
+        <ul class="breadcrumb-tree">
+            <li>
+                <a href="#">Dashboard</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="container" style="display:flex;gap:30px;">
+    <!-- Sidebar -->
+    <aside style="width:260px;">
+        <div class="aside">
+            <h4 class="aside-title">Management</h4>
+            <ul class="footer-links">
+                <li>
+                    <a href="#">Brands</a>
+                </li>
+                <li>
+                    <a href="#">Categories</a>
+                </li>
+                <li>
+                    <a href="#">Orders</a>
+                </li>
+                <li>
+                    <a href="#">Payments</a>
+                </li>
+                <li>
+                    <a href="#">Products</a>
+                </li>
+                <li>
+                    <a href="#">Reviews</a>
+                </li>
+                <li>
+                    <a href="#">Shipping methods</a>
+                </li>
+            </ul>
+        </div>
+        <div class="aside" style="margin-top:30px;">
+            <h4 class="aside-title">Quick actions</h4>
+            <button class="primary-btn" style="width:100%;">New product</button>
+            <div style="height:10px"></div>
+            <a href="#" class="primary-btn" style="display:block;text-align:center;">Create an order</a>
+        </div>
+    </aside>
+    <!-- Main content -->
+    <main style="flex:1;">
+        <!-- Overview cards -->
+        <section class="section">
+            <div class="section-title">
+                <h3 class="title">Overview</h3>
+            </div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                <div style="flex:1;
+                            min-width:180px;
+                            background:#FFF;
+                            padding:20px;
+                            border:1px solid #E4E7ED;
+                            border-radius:8px">
+                    <h4 style="margin:0 0 10px;">Products</h4>
+                    <p style="font-size:24px;color:#D10024;font-weight:700;">{{ total_products|default:'0' }}</p>
+                </div>
+                <div style="flex:1;
+                            min-width:180px;
+                            background:#FFF;
+                            padding:20px;
+                            border:1px solid #E4E7ED;
+                            border-radius:8px">
+                    <h4 style="margin:0 0 10px;">Orders (30 days)</h4>
+                    <p style="font-size:24px;color:#D10024;font-weight:700;">{{ orders_count_30d|default:'0' }}</p>
+                </div>
+                <div style="flex:1;
+                            min-width:180px;
+                            background:#FFF;
+                            padding:20px;
+                            border:1px solid #E4E7ED;
+                            border-radius:8px">
+                    <h4 style="margin:0 0 10px;">Revenue (30 days)</h4>
+                    <p style="font-size:24px;color:#D10024;font-weight:700;">{{ revenue_30d|default:'0' }}</p>
+                </div>
+                <div style="flex:1;
+                            min-width:180px;
+                            background:#FFF;
+                            padding:20px;
+                            border:1px solid #E4E7ED;
+                            border-radius:8px">
+                    <h4 style="margin:0 0 10px;">Pending payments</h4>
+                    <p style="font-size:24px;color:#D10024;font-weight:700;">{{ pending_payments|default:'0' }}</p>
+                </div>
+            </div>
+        </section>
+        <!-- Orders table -->
+        <section class="section">
+            <div class="section-title">
+                <h3 class="title">Recent Orders</h3>
+            </div>
+            <div style="background:#FFF;
+                        border:1px solid #E4E7ED;
+                        padding:15px;
+                        border-radius:8px">
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr style="text-align:left;border-bottom:1px solid #E4E7ED;">
+                            <th style="padding:10px 8px;">#</th>
+                            <th style="padding:10px 8px;">Customer</th>
+                            <th style="padding:10px 8px;">Status</th>
+                            <th style="padding:10px 8px;">Amount</th>
+                            <th style="padding:10px 8px;">Date</th>
+                            <th style="padding:10px 8px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                            <tr style="border-bottom:1px solid #F5F5F5;">
+                                <td style="padding:12px 8px;">{{ order.pk }}</td>
+                                <td style="padding:12px 8px;">{{ order.customer.username }}</td>
+                                <td style="padding:12px 8px;">{{ order.get_status_for_display }}</td>
+                                <td style="padding:12px 8px;color:#D10024;font-weight:700;">{{ order.total_amount }}</td>
+                                <td style="padding:12px 8px;">{{ order.created_at }}</td>
+                                <td style="padding:12px 8px;text-align:right;">
+                                    <a href="#"
+                                       class="primary-btn"
+                                       style="padding:8px 14px;
+                                              border-radius:20px;
+                                              text-transform:none">Details</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" style="padding:20px;text-align:center;color:#8D99AE;">No recent orders</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <!-- Reviews & Quick lists -->
+        <section class="section" style="display:flex;gap:20px;align-items:flex-start;">
+            <div style="flex:1;
+                        background:#FFF;
+                        padding:15px;
+                        border:1px solid #E4E7ED;
+                        border-radius:8px">
+                <h4 style="margin-top:0;">Recent reviews</h4>
+                <ul class="reviews">
+                    {% for review in recent_reviews %}
+                        <li>
+                            <div class="review-heading">
+                                <p class="name">{{ review.author.username }}</p>
+                                <p class="date">{{ review.created_at }}</p>
+                            </div>
+                            <div class="review-body">{{ review.body|truncatechars:140 }}</div>
+                        </li>
+                    {% empty %}
+                        <li>Brak opinii</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div style="width:320px;
+                        background:#FFF;
+                        padding:15px;
+                        border:1px solid #E4E7ED;
+                        border-radius:8px">
+                <h4 style="margin-top:0;">Summary</h4>
+                <ul style="padding-left:0;list-style:none;">
+                    <li style="padding:8px 0;">
+                        Brands: <strong>{{ brands_count|default:'0' }}</strong>
+                    </li>
+                    <li style="padding:8px 0;">
+                        Categories: <strong>{{ categories_count|default:'0' }}</strong>
+                    </li>
+                    <li style="padding:8px 0;">
+                        Shipping methods: <strong>{{ shipping_methods_count|default:'0' }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+</div>
+<footer id="bottom-footer" style="margin-top:40px;padding:20px 0;">
+</footer>

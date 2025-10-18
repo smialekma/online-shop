@@ -24,6 +24,7 @@ class Customer(AbstractUser):  # AbstractBaseUser
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(_("email address"), unique=True)
     is_active = models.BooleanField(default=False)
+    is_manager = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]

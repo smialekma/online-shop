@@ -38,6 +38,7 @@ INSTALLED_EXTENSIONS = [
     "product_reviews.apps.ProductReviewsConfig",
     "products.apps.ProductsConfig",
     "orders.apps.OrdersConfig",
+    "management_panel.apps.ManagementPanelConfig",
 ]
 
 
