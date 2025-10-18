@@ -2,16 +2,23 @@ from datetime import timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Sum
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.utils import timezone
+from django_filters.views import FilterView
 
+from management_panel.filters import OrderManagementFilter, BrandManagementFilter
 from orders.models import ShippingMethod, Order
 from payments.models import Payment
 from product_reviews.models import Review
 from products.models import Product, Brand, Category
 
 
-class ManagementPanelView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class ManagementBaseView(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_manager or self.request.user.is_superuser
+
+
+class ManagementPanelView(ManagementBaseView, TemplateView):
     template_name = "management_panel/management_panel.html"
 
     def test_func(self):
@@ -20,35 +27,147 @@ class ManagementPanelView(LoginRequiredMixin, UserPassesTestMixin, TemplateView)
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
 
-        context["total_products"] = Product.objects.count()
-        context["brands_count"] = Brand.objects.count()
-        context["categories_count"] = Category.objects.count()
-        context["shipping_methods_count"] = ShippingMethod.objects.count()
+        recent_items = self._get_recent_items()
+        monthly_statistics = self._get_item_monthly_statistics()
+        item_counts = self._get_item_counts()
 
-        context["pending_payments"] = Payment.objects.filter(is_paid=False).count()
+        context["total_products"] = item_counts["total_products"]
+        context["brands_count"] = item_counts["brands_count"]
+        context["categories_count"] = item_counts["categories_count"]
+        context["shipping_methods_count"] = item_counts["shipping_methods_count"]
 
-        today = timezone.now()
-        today_minus_30d = today - timedelta(days=30)
+        context["pending_payments"] = item_counts["pending_payments"]
 
-        context["orders_count_30d"] = Order.objects.filter(
-            created_at__gt=today_minus_30d
-        ).count()
-        context["revenue_30d"] = (
-            Payment.objects.filter(
-                is_paid=True, created_at__gt=today_minus_30d
-            ).aggregate(Sum("amount"))["amount__sum"]
-        ) or 0
+        context["orders_count_30d"] = monthly_statistics["orders_count_30d"]
+        context["revenue_30d"] = monthly_statistics["revenue_30d"]
 
-        context["recent_orders"] = Order.objects.select_related("customer").order_by(
-            "-created_at"
-        )[:5]
-        context["recent_reviews"] = Review.objects.select_related("author").order_by(
-            "-created_at"
-        )[:2]
+        context["recent_orders"] = recent_items["recent_orders"]
+        context["recent_reviews"] = recent_items["recent_reviews"]
 
         return context
 
-    # def _get_recent_items(self):
-    #     return {
-    #         "recent_reviews": Review.objects.select_related("author").order_by("-created_at")[:2]
-    #     }
+    def _get_recent_items(self):
+        return {
+            "recent_reviews": Review.objects.select_related("author").order_by(
+                "-created_at"
+            )[:2],
+            "recent_orders": Order.objects.select_related("customer").order_by(
+                "-created_at"
+            )[:5],
+        }
+
+    def _get_item_counts(self):
+        return {
+            "total_products": Product.objects.count(),
+            "brands_count": Brand.objects.count(),
+            "categories_count": Category.objects.count(),
+            "shipping_methods_count": ShippingMethod.objects.count(),
+            "pending_payments": Payment.objects.filter(is_paid=False).count(),
+        }
+
+    def _get_item_monthly_statistics(self):
+        today = timezone.now()
+        today_minus_30d = today - timedelta(days=30)
+
+        return {
+            "orders_count_30d": Order.objects.filter(
+                created_at__gt=today_minus_30d
+            ).count(),
+            "revenue_30d": (
+                Payment.objects.filter(
+                    is_paid=True, created_at__gt=today_minus_30d
+                ).aggregate(Sum("amount"))["amount__sum"]
+            )
+            or 0,
+        }
+
+
+class OrderManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_orders.html"
+    model = Order
+    filterset_class = OrderManagementFilter
+    context_object_name = "orders"
+    ordering = "-created_at"
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        queryset = queryset.select_related("customer")
+
+        return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        print(context_data)
+
+        return context_data
+
+
+class BrandManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_brands.html"
+    model = Brand
+    filterset_class = BrandManagementFilter
+    context_object_name = "brands"
+    ordering = "name"
+    paginate_by = 5
+
+
+class CategoryManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_categories.html"
+    model = Category
+    # filterset_class = CategoryManagementFilter
+    context_object_name = "categories"
+    ordering = "-name"
+    paginate_by = 5
+
+
+class ReviewManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_reviews.html"
+    model = Review
+    # filterset_class = ReviewManagementFilter
+    context_object_name = "reviews"
+    ordering = "-created_at"
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        queryset = queryset.select_related("author")
+
+        return queryset
+
+
+class PaymentManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_payments.html"
+    model = Payment
+    # filterset_class = PaymentManagementFilter
+    context_object_name = "payments"
+    ordering = "-created_at"
+    paginate_by = 5
+
+
+class ProductManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_products.html"
+    model = Product
+    # filterset_class = ProductManagementFilter
+    context_object_name = "products"
+    ordering = "-created_at"
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        queryset = queryset.select_related("brand").select_related("category")
+
+        return queryset
+
+
+class ShippingMethodManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_shipping.html"
+    model = ShippingMethod
+    # filterset_class = ShippingMethodManagementFilter
+    context_object_name = "methods"
+    ordering = "-name"
+    paginate_by = 5
