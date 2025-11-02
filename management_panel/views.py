@@ -6,7 +6,15 @@ from django.views.generic import TemplateView, ListView
 from django.utils import timezone
 from django_filters.views import FilterView
 
-from management_panel.filters import OrderManagementFilter, BrandManagementFilter
+from management_panel.filters import (
+    OrderManagementFilter,
+    BrandManagementFilter,
+    CategoryManagementFilter,
+    ReviewManagementFilter,
+    PaymentManagementFilter,
+    ProductManagementFilter,
+    ShippingMethodManagementFilter,
+)
 from orders.models import ShippingMethod, Order
 from payments.models import Payment
 from product_reviews.models import Review
@@ -117,7 +125,7 @@ class BrandManagementListView(ManagementBaseView, FilterView, ListView):
 class CategoryManagementListView(ManagementBaseView, FilterView, ListView):
     template_name = "management_panel/management_categories.html"
     model = Category
-    # filterset_class = CategoryManagementFilter
+    filterset_class = CategoryManagementFilter
     context_object_name = "categories"
     ordering = "-name"
     paginate_by = 5
@@ -126,7 +134,7 @@ class CategoryManagementListView(ManagementBaseView, FilterView, ListView):
 class ReviewManagementListView(ManagementBaseView, FilterView, ListView):
     template_name = "management_panel/management_reviews.html"
     model = Review
-    # filterset_class = ReviewManagementFilter
+    filterset_class = ReviewManagementFilter
     context_object_name = "reviews"
     ordering = "-created_at"
     paginate_by = 5
@@ -134,7 +142,7 @@ class ReviewManagementListView(ManagementBaseView, FilterView, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        queryset = queryset.select_related("author")
+        queryset = queryset.select_related("author").select_related("product")
 
         return queryset
 
@@ -142,18 +150,25 @@ class ReviewManagementListView(ManagementBaseView, FilterView, ListView):
 class PaymentManagementListView(ManagementBaseView, FilterView, ListView):
     template_name = "management_panel/management_payments.html"
     model = Payment
-    # filterset_class = PaymentManagementFilter
+    filterset_class = PaymentManagementFilter
     context_object_name = "payments"
     ordering = "-created_at"
     paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        queryset = queryset.select_related("order")
+
+        return queryset
 
 
 class ProductManagementListView(ManagementBaseView, FilterView, ListView):
     template_name = "management_panel/management_products.html"
     model = Product
-    # filterset_class = ProductManagementFilter
+    filterset_class = ProductManagementFilter
     context_object_name = "products"
-    ordering = "-created_at"
+    ordering = "-date_added"
     paginate_by = 5
 
     def get_queryset(self):
@@ -167,7 +182,7 @@ class ProductManagementListView(ManagementBaseView, FilterView, ListView):
 class ShippingMethodManagementListView(ManagementBaseView, FilterView, ListView):
     template_name = "management_panel/management_shipping.html"
     model = ShippingMethod
-    # filterset_class = ShippingMethodManagementFilter
+    filterset_class = ShippingMethodManagementFilter
     context_object_name = "methods"
     ordering = "-name"
     paginate_by = 5
