@@ -5,6 +5,7 @@ from .payments import PaymentManagementFilter
 from .products import ProductManagementFilter
 from .reviews import ReviewManagementFilter
 from .shipping_methods import ShippingMethodManagementFilter
+from .users import UserManagementFilter
 
 
 __all__ = [
@@ -15,4 +16,5 @@ __all__ = [
     "ProductManagementFilter",
     "ReviewManagementFilter",
     "ShippingMethodManagementFilter",
+    "UserManagementFilter",
 ]

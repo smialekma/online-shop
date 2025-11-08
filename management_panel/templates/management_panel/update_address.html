@@ -1,0 +1,59 @@
+{% load static %}
+{% load crispy_forms_tags %}
+{% include "dashboard/login_header.html" %}
+<!-- Breadcrumb -->
+<div id="breadcrumb">
+    <div class="container">
+        <h3 class="breadcrumb-header">Address #{{ object.id }}</h3>
+        <ul class="breadcrumb-tree">
+            <li>
+                <a href="{% url "home-view" %}">Home</a>
+            </li>
+            <li>
+                <a href="{% url "management-view" %}">Management panel</a>
+            </li>
+            <li class="active">Address #{{ object.id }}</li>
+        </ul>
+    </div>
+</div>
+<!-- SECTION -->
+<div class="section">
+    <!-- container -->
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <!-- row -->
+            <div class="row">
+                <div class="col-md-7">
+                    <!-- Billing Details -->
+                    <div class="billing-details">
+                        <div class="section-title">
+                            <h3 class="title">Shipping address</h3>
+                        </div>
+                        {% for field in form %}{{ field|as_crispy_field }}{% endfor %}
+                        {#                            <div class="input-checkbox">#}
+                        {#                                {{ form.agree }}#}
+                        {#                                <label for="{{ form.agree.id_for_label }}">#}
+                        {#                                    <span></span>#}
+                        {#                                I've read and accept the <a href="#" target="_blank">terms & conditions</a>*#}
+                        {#                                </label>#}
+                        {#                                {% if form.agree.errors %}#}
+                        {#                                  <div>{{ form.agree.errors }}</div>#}
+                        {#                                {% endif %}#}
+                        {#                            </div>#}
+                    </div>
+                </div>
+                <!-- /Billing Details -->
+            </div>
+            <!-- /row -->
+            <button type="submit"
+                    class="primary-btn"
+                    style="display:inline-block;
+                           width:auto">Save</button>
+        </form>
+    </div>
+    <!-- /container -->
+</div>
+<!-- /SECTION -->
+<footer id="bottom-footer" style="margin-top:40px;padding:20px 0;">
+</footer>
