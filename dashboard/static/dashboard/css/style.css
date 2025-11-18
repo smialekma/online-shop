@@ -108,11 +108,19 @@ ul, ol {
   text-align: center;
   -webkit-transition: 0.2s all;
   transition: 0.2s all;
+  width: auto;
 }
 
 .primary-btn:hover, .primary-btn:focus {
   opacity: 0.9;
   color: #FFF;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 20px;
 }
 
 /*----------------------------*\

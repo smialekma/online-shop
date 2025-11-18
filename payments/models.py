@@ -15,3 +15,9 @@ class Payment(models.Model):
     payment_method = models.CharField(null=True, blank=True)
     is_paid = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
+
+    def get_status_for_display(self) -> str:
+        if self.is_paid:
+            return "Paid"
+        else:
+            return "Unpaid"
