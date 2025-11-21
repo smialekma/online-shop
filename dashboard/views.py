@@ -1,9 +1,11 @@
 import random
 
-from django.db.models import Count, F, Sum
+from django.core.paginator import Paginator
+from django.db.models import Count, F, Sum, Q
 from django.views.generic import TemplateView
 from django.db.models import Prefetch
 
+from dashboard.forms import SearchForm
 from orders.models import Order
 from products.models import Category, Product, ProductImage
 
@@ -140,5 +142,31 @@ class AccountView(TemplateView):
         for order in orders_with_order_items:
             for order_item in order.order_items.all():
                 context["total_products"] += order_item.quantity
+
+        return context
+
+
+class GlobalSearchView(TemplateView):
+    template_name = "dashboard/search.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = SearchForm(self.request.GET)
+        context["form"] = form
+        context["products"] = []
+
+        if form.is_valid():
+            query = form.cleaned_data["query"]
+
+            products = Product.objects.filter(
+                Q(name__icontains=query) | Q(description__icontains=query)
+            )
+
+            context["query"] = query
+            paginator = Paginator(products, 5)
+            page_number = self.request.GET.get("page")
+            page_obj = paginator.get_page(page_number)
+            context["page_obj"] = page_obj
+            context["products"] = page_obj
 
         return context
