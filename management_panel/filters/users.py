@@ -1,7 +1,7 @@
 import django_filters
 from django.db.models import Q
 
-from products.models import Product
+from customers.models import Customer
 
 
 class UserManagementFilter(django_filters.FilterSet):
@@ -12,7 +12,7 @@ class UserManagementFilter(django_filters.FilterSet):
     is_manager = django_filters.BooleanFilter(label="")
 
     class Meta:
-        model = Product
+        model = Customer
         fields = ["search", "is_active", "is_manager"]
 
     def filter_search(self, queryset, name, value):
