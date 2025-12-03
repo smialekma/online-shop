@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from .env import env
 from django.contrib import messages
 
@@ -39,6 +40,7 @@ INSTALLED_EXTENSIONS = [
     "products.apps.ProductsConfig",
     "orders.apps.OrdersConfig",
     "management_panel.apps.ManagementPanelConfig",
+    "newsletter.apps.NewsletterConfig",
 ]
 
 
