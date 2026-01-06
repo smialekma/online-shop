@@ -12,8 +12,11 @@ from management_panel.filters import (
     CategoryManagementFilter,
     BrandManagementFilter,
     OrderManagementFilter,
+    NewsletterManagementFilter,
 )
+from management_panel.filters.subscribers import SubscriberManagementFilter
 from management_panel.views.panel_view import ManagementBaseView
+from newsletter.models import Subscriber, NewsletterPost
 from orders.models import ShippingMethod, Order
 from payments.models import Payment
 from product_reviews.models import Review
@@ -124,4 +127,22 @@ class UserManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = UserManagementFilter
     context_object_name = "users"
     ordering = "username"
+    paginate_by = 5
+
+
+class SubscriberManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_subscribers.html"
+    model = Subscriber
+    filterset_class = SubscriberManagementFilter
+    context_object_name = "subscribers"
+    ordering = "-date_subscribed"
+    paginate_by = 5
+
+
+class NewsletterManagementListView(ManagementBaseView, FilterView, ListView):
+    template_name = "management_panel/management_newsletter.html"
+    model = NewsletterPost
+    filterset_class = NewsletterManagementFilter
+    context_object_name = "posts"
+    ordering = "-created_at"
     paginate_by = 5

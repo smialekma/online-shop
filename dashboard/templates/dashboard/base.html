@@ -250,9 +250,14 @@
                             <p>
                                 Sign Up for the <strong>NEWSLETTER</strong>
                             </p>
-                            <form>
-                                <input class="input" type="email" placeholder="Enter Your Email">
-                                <button class="newsletter-btn">
+                            <form method="POST" action="{% url "subscribe-newsletter" %}">
+                                {% csrf_token %}
+                                <input class="input"
+                                       type="email"
+                                       name="email"
+                                       placeholder="Enter Your Email"
+                                       required>
+                                <button class="newsletter-btn" type="submit">
                                     <i class="fa fa-envelope"></i> Subscribe
                                 </button>
                             </form>

@@ -9,6 +9,8 @@ from management_panel.views.list_views import (
     ProductManagementListView,
     ShippingMethodManagementListView,
     UserManagementListView,
+    SubscriberManagementListView,
+    NewsletterManagementListView,
 )
 from management_panel.views.panel_view import ManagementPanelView
 from management_panel.views.update_views import (
@@ -21,6 +23,8 @@ from management_panel.views.update_views import (
     ShippingMethodUpdateView,
     AddressUpdateView,
     UserUpdateView,
+    SubscriberUpdateView,
+    NewsletterUpdateView,
 )
 
 urlpatterns = [
@@ -72,4 +76,24 @@ urlpatterns = [
     ),
     path("users/", UserManagementListView.as_view(), name="management-users"),
     path("users/<int:pk>", UserUpdateView.as_view(), name="management-users-update"),
+    path(
+        "subscribers/",
+        SubscriberManagementListView.as_view(),
+        name="management-subscribers",
+    ),
+    path(
+        "subscribers/<int:pk>",
+        SubscriberUpdateView.as_view(),
+        name="management-subscribers-update",
+    ),
+    path(
+        "newsletter/",
+        NewsletterManagementListView.as_view(),
+        name="management-newsletter",
+    ),
+    path(
+        "newsletter/<int:pk>",
+        NewsletterUpdateView.as_view(),
+        name="management-newsletter-update",
+    ),
 ]

@@ -9,8 +9,11 @@ from management_panel.forms import (
     PaymentUpdateForm,
     ProductUpdateForm,
     UserUpdateForm,
+    SubscriberUpdateForm,
+    NewsletterUpdateForm,
 )
 from management_panel.views.panel_view import ManagementBaseView
+from newsletter.models import Subscriber, NewsletterPost
 from orders.models import Order, OrderItem, ShippingMethod
 from payments.models import Payment
 from product_reviews.models import Review
@@ -97,3 +100,17 @@ class UserUpdateView(ManagementBaseView, UpdateView):
     template_name = "management_panel/update_user.html"
     form_class = UserUpdateForm
     success_url = reverse_lazy("management-users")
+
+
+class SubscriberUpdateView(ManagementBaseView, UpdateView):
+    model = Subscriber
+    template_name = "management_panel/update_subscriber.html"
+    form_class = SubscriberUpdateForm
+    success_url = reverse_lazy("management-subscribers")
+
+
+class NewsletterUpdateView(ManagementBaseView, UpdateView):
+    model = NewsletterPost
+    template_name = "management_panel/update_newsletter.html"
+    form_class = NewsletterUpdateForm
+    success_url = reverse_lazy("management-newsletter")
