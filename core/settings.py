@@ -41,6 +41,7 @@ INSTALLED_EXTENSIONS = [
     "orders.apps.OrdersConfig",
     "management_panel.apps.ManagementPanelConfig",
     "newsletter.apps.NewsletterConfig",
+    "wishlist.apps.WishlistConfig",
 ]
 
 
@@ -153,6 +154,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 LOGIN_URL = "login-view"
 LOGIN_REDIRECT_URL = "home-view"
 LOGOUT_REDIRECT_URL = "home-view"
+REDIRECT_FIELD_NAME = "next"
 
 # User substitution
 # https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#auth-custom-user

@@ -1,0 +1,75 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+    <!-- Breadcrumb -->
+    <div id="breadcrumb">
+        <div class="container">
+            <h3 class="breadcrumb-header">Wishlist</h3>
+            <ul class="breadcrumb-tree">
+                <li>
+                    <a href="{% url "home-view" %}">Home</a>
+                </li>
+                <li>
+                    <a href="{% url "account-view" %}">My Account</a>
+                </li>
+                <li class="active">Wishlist</li>
+            </ul>
+        </div>
+    </div>
+    <!-- /Breadcrumb -->
+    <!-- Wishlist Section -->
+    <div class="section">
+        <div class="container">
+            {% if items %}
+                <div class="row">
+                    {% for item in items %}
+                        <div class="col-md-3 col-sm-6">
+                            <div class="product">
+                                <div class="product-img">
+                                    {% for image in item.product.images.all %}
+                                        {% if image.is_main_photo %}<img src="{{ image.photo.url }}" alt="">{% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="product-body">
+                                    <p class="product-category">{{ item.product.category.name }}</p>
+                                    <h3 class="product-name">
+                                        <a href="{% url "detail-view" item.product.id %}">{{ item.product.name }}</a>
+                                    </h3>
+                                    <h4 class="product-price">{{ item.product.price }}</h4>
+                                    <div class="product-rating">
+                                        {% for number in rating_options %}
+                                            {% if number > item.product.get_average_rating %}
+                                                <i class="fa fa-star-o"></i>
+                                            {% else %}
+                                                <i class="fa fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="product-btns">
+                                        <button class="add-to-wishlist">
+                                            <i class="fa fa-remove"></i><span class="tooltipp">remove from wishlist</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="add-to-cart">
+                                    <form action="{% url "product-add" %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                        <button class="add-to-cart-btn" type="submit">
+                                            <i class="fa fa-shopping-cart"></i> add to cart
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>
+                    Your wishlist is empty.
+                    <a href="{% url "home-view" %}">Back to the store</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    <!-- /Wishlist Section -->
+{% endblock %}

@@ -1,5 +1,6 @@
 import random
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Sum, Q
 from django.views.generic import TemplateView
@@ -124,7 +125,7 @@ class HomeView(TemplateView):
         return context
 
 
-class AccountView(TemplateView):
+class AccountView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/account.html"
 
     def get_context_data(self, **kwargs):

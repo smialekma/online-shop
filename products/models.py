@@ -1,6 +1,6 @@
 from django.db import models
 from PIL import Image
-from django.db.models import Count
+from django.db.models import Count, Avg
 from django.utils import timezone
 from typing import Any
 
@@ -89,6 +89,12 @@ class Product(models.Model):
             related_products.append({"product": product, "main_photo": main_photo})
 
         return related_products
+
+    def get_average_rating(self) -> float:
+        reviews = self.reviews
+        review_aggregations = reviews.aggregate(average_rating=Avg("rating"))
+        print("hello")
+        return review_aggregations.average_rating
 
 
 class ProductImage(models.Model):
