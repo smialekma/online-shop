@@ -20,7 +20,7 @@ def subscribe_newsletter(request):
             _send_email(current_site, subscriber, form.cleaned_data.get("email"))
             messages.success(
                 request,
-                "You have successfully subscribed!"
+                "You have successfully subscribed! "
                 "We've emailed you instructions for activating your newsletter. "
                 "If an account exists with the email you entered, you should receive them shortly. "
                 "If you don't receive an email, "
@@ -32,7 +32,7 @@ def subscribe_newsletter(request):
 
 
 def _send_email(current_site, subscriber, email):
-    mail_subject = "Online Shop - activate your account"
+    mail_subject = "Online Shop - activate your newsletter subscription"
     message = render_to_string(
         "newsletter/newsletter_activation_email.html",
         {
@@ -57,7 +57,7 @@ def confirm_subscription(request, uidb64, token):
         subscriber, token
     ):
         subscriber.is_active = True
-        subscriber.save(updated_fields=["is_active"])
+        subscriber.save(update_fields=["is_active"])
         messages.success(
             request, "You have successfully activated your newsletter subscription."
         )
