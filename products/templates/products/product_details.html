@@ -109,14 +109,18 @@
                                 <i class="fa fa-shopping-cart"></i> add to cart
                             </button>
                         </div>
-                        <ul class="product-btns">
-                            <li>
-                                <a href="#"><i class="fa fa-heart-o"></i> add to wishlist</a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="fa fa-exchange"></i> add to compare</a>
-                            </li>
-                        </ul>
+                        {% if product.id not in wishlist_items %}
+                            <div class="product-btns">
+                                <form action="{% url 'wishlist-add' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <button type="submit" class="add-to-wishlist">
+                                        <i class="fa fa-heart-o"></i>
+                                        <span class="product-btn-text">add to wishlist</span>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
                         <ul class="product-links">
                             <li>Category:</li>
                             <li>
@@ -411,15 +415,17 @@
                                 {% endif %}
                                 <div class="product-rating"></div>
                                 <div class="product-btns">
-                                    <button class="add-to-wishlist">
-                                        <i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span>
-                                    </button>
-                                    <button class="add-to-compare">
-                                        <i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span>
-                                    </button>
-                                    <button class="quick-view">
-                                        <i class="fa fa-eye"></i><span class="tooltipp">quick view</span>
-                                    </button>
+                                    {% if product.id in wishlist_items %}
+                                        <i class="fa fa-heart"></i>
+                                    {% else %}
+                                        <form action="{% url "wishlist-add" %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                                            <button class="add-to-wishlist" type="submit">
+                                                <i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="add-to-cart">
