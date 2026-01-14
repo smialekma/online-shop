@@ -45,9 +45,13 @@
                                         {% endfor %}
                                     </div>
                                     <div class="product-btns">
-                                        <button class="add-to-wishlist">
-                                            <i class="fa fa-remove"></i><span class="tooltipp">remove from wishlist</span>
-                                        </button>
+                                        <form action="{% url "wishlist-remove" %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                            <button class="add-to-wishlist" type="submit">
+                                                <i class="fa fa-remove"></i><span class="tooltipp">remove from wishlist</span>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                                 <div class="add-to-cart">
@@ -69,6 +73,30 @@
                     <a href="{% url "home-view" %}">Back to the store</a>
                 </p>
             {% endif %}
+            <!-- Pagination -->
+            <div class="store-filter clearfix">
+                {% if page_obj.has_other_pages %}
+                    <ul class="store-pagination">
+                        {% if page_obj.has_previous %}
+                            <li>
+                                <a href="{% querystring page=page_obj.previous_page_number %}"><i class="fa fa-angle-left"></i></a>
+                            </li>
+                            <li>
+                                <a href="{% querystring page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                            </li>
+                        {% endif %}
+                        <li class="active">{{ page_obj.number }}</li>
+                        {% if page_obj.has_next %}
+                            <li>
+                                <a href="{% querystring page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                            </li>
+                            <li>
+                                <a href="{% querystring page=page_obj.next_page_number %}"><i class="fa fa-angle-right"></i></a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
         </div>
     </div>
     <!-- /Wishlist Section -->
