@@ -81,20 +81,17 @@ class Product(models.Model):
         related_products = []
 
         for item in products_counts[:limit]:
-            product = Product.objects.get(id=item["product_id"])
+            product = (
+                Product.objects.filter(id=item["product_id"])
+                .prefetch_related("reviews")
+                .annotate(average_rating=Avg("reviews__rating"))
+            )[0]
             main_photo = ProductImage.objects.filter(
                 product_id=product, is_main_photo=True
             ).first()
 
             related_products.append({"product": product, "main_photo": main_photo})
-
         return related_products
-
-    def get_average_rating(self) -> float:
-        reviews = self.reviews
-        review_aggregations = reviews.aggregate(average_rating=Avg("rating"))
-        print("hello")
-        return review_aggregations.average_rating
 
 
 class ProductImage(models.Model):

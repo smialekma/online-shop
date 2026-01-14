@@ -1,7 +1,6 @@
-from typing import Any
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Avg
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView
@@ -17,17 +16,16 @@ class WishlistView(LoginRequiredMixin, ListView):
     ordering = "-date_added"
     paginate_by = 5
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context_data = super().get_context_data(**kwargs)
-        context_data["rating_options"] = (1, 2, 3, 4, 5)
-
-        return context_data
-
     def get_queryset(self):
         queryset = super().get_queryset()
 
         if self.request.user.is_authenticated:
-            return queryset.select_related("product").filter(customer=self.request.user)
+            return (
+                queryset.select_related("product")
+                .prefetch_related("product__reviews")
+                .filter(customer=self.request.user)
+                .annotate(average_rating=Avg("product__reviews__rating"))
+            )
         else:
             return []
 

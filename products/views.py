@@ -27,7 +27,13 @@ class ProductView(ListView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
 
-        f = ProductFilter(self.request.GET, queryset=Product.objects.all())
+        f = ProductFilter(
+            self.request.GET,
+            queryset=Product.objects.all()
+            .prefetch_related("reviews")
+            .annotate(average_rating=Avg("reviews__rating")),
+        )
+
         context_data["filter"] = f
 
         paginator = Paginator(f.qs, 3)

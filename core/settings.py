@@ -81,6 +81,7 @@ TEMPLATES = [
                 "carts.context_processors.cart",
                 "orders.context_processors.checkout_enabled",
                 "wishlist.context_processors.wishlist_items",
+                "product_reviews.context_processors.rating_options",
             ],
         },
     },
