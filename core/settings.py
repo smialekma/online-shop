@@ -80,6 +80,7 @@ TEMPLATES = [
                 "products.context_processors.categories",
                 "carts.context_processors.cart",
                 "orders.context_processors.checkout_enabled",
+                "wishlist.context_processors.wishlist_items",
             ],
         },
     },
