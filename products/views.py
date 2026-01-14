@@ -103,7 +103,7 @@ class ProductDetailView(CreateView, DetailView):
         return str(self.get_object().id)
 
 
-def add_product(request: HttpRequest) -> HttpResponseRedirect:
+def add_to_cart(request: HttpRequest) -> HttpResponseRedirect:
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, id=product_id)
 
@@ -113,7 +113,7 @@ def add_product(request: HttpRequest) -> HttpResponseRedirect:
     return redirect("product-view")
 
 
-def remove_product(request: HttpRequest) -> HttpResponseRedirect:
+def remove_from_cart(request: HttpRequest) -> HttpResponseRedirect:
     product_id = request.POST.get("product_id")
     product = get_object_or_404(Product, id=product_id)
     # print(product.id)
