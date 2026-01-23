@@ -1,7 +1,8 @@
 import random
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Sum, Q
+from django.db.models import Count, F, Sum, Q, Avg
 from django.views.generic import TemplateView
 from django.db.models import Prefetch
 
@@ -96,6 +97,8 @@ class HomeView(TemplateView):
                 .filter(category=category.id)
                 .select_related("category")
                 .order_by("date_added")
+                .prefetch_related("reviews")
+                .annotate(average_rating=Avg("reviews__rating"))
                 .prefetch_related(
                     Prefetch(
                         "images",
@@ -111,6 +114,8 @@ class HomeView(TemplateView):
                 .select_related("category")
                 .annotate(count=Count("order_items"))
                 .order_by("-count")
+                .prefetch_related("reviews")
+                .annotate(average_rating=Avg("reviews__rating"))
                 .prefetch_related(
                     Prefetch(
                         "images",
@@ -124,7 +129,7 @@ class HomeView(TemplateView):
         return context
 
 
-class AccountView(TemplateView):
+class AccountView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/account.html"
 
     def get_context_data(self, **kwargs):

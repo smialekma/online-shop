@@ -991,7 +991,7 @@ textarea.input {
   background-color: #E4E7ED;
 }
 
-.product .product-body .product-btns>button {
+.product .product-body .product-btns button {
   position: relative;
   width: 40px;
   height: 40px;
@@ -1002,13 +1002,13 @@ textarea.input {
   transition: 0.2s all;
 }
 
-.product .product-body .product-btns>button:hover {
+.product .product-body .product-btns button:hover {
   background-color: #E4E7ED;
   color: #D10024;
   border-radius: 50%;
 }
 
-.product .product-body .product-btns>button .tooltipp {
+.product .product-body .product-btns button .tooltipp {
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -1029,7 +1029,7 @@ textarea.input {
   transition: 0.2s all;
 }
 
-.product .product-body .product-btns>button:hover .tooltipp {
+.product .product-body .product-btns button:hover .tooltipp {
   opacity: 1;
   visibility: visible;
   -webkit-transform: translate(-50%, -5px);
@@ -1605,10 +1605,23 @@ textarea.input {
   display: inline-block;
 }
 
-.product-details .product-btns li {
+.product-details .product-btns button {
   display: inline-block;
   text-transform: uppercase;
   font-size: 12px;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.product-details .product-btns button .product-btn-text{
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.product-details .product-btns button:hover {
+  color: #D10024;
+  border-radius: 50%;
 }
 
 .product-details .product-btns li+li {

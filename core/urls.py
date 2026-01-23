@@ -14,6 +14,7 @@ urlpatterns = [
     path("", include("customer_addresses.urls")),
     path("management/", include("management_panel.urls")),
     path("", include("newsletter.urls")),
+    path("", include("wishlist.urls")),
 ]
 
 
