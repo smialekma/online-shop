@@ -3,16 +3,17 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-
+from django.template.loader import render_to_string
 from product_reviews.models import Review
 from .filters import ProductFilter
 from .models import Product, ProductImage
 from django.shortcuts import redirect
 from product_reviews.forms import ReviewForm
+from django.core.serializers.json import DjangoJSONEncoder
 
 from carts.cart import Cart
 from django.core.paginator import Paginator
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from typing import Optional, Any
 
 
@@ -117,6 +118,31 @@ def add_to_cart(request: HttpRequest) -> HttpResponseRedirect:
     cart.add(product)
 
     return redirect("product-view")
+
+
+def add_to_cart1(request: HttpRequest) -> JsonResponse:
+    if request.method == "POST":
+        product_id = request.POST.get("product_id")
+        product = get_object_or_404(Product, id=product_id)
+
+        cart = Cart(request)
+        cart.add(product)
+
+        cart_html = render_to_string(
+            "partials/cart_items.html", {"cart": cart}, request=request
+        )
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "Product added to cart",
+                "cart_count": len(cart),
+                "cart_html": cart_html,
+            },
+            encoder=DjangoJSONEncoder,
+        )
+
+    return JsonResponse({"success": False}, status=400)
 
 
 def remove_from_cart(request: HttpRequest) -> HttpResponseRedirect:

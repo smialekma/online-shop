@@ -1,0 +1,24 @@
+{% for cart_item in cart %}
+    <div class="product-widget">
+        <div class="product-img">
+            {% if cart_item.product.main_image_url %}<img src="{{ cart_item.product.main_image_url }}">{% endif %}
+        </div>
+        <div class="product-body">
+            <h3 class="product-name">
+                <a href="{% url "detail-view" cart_item.product.id %}">{{ cart_item.product.name }}</a>
+            </h3>
+            <h4 class="product-price">
+                <span class="qty">{{ cart_item.quantity }}x</span>{{ cart_item.product.price }}
+            </h4>
+        </div>
+        <form action="{% url "product-remove" %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ cart_item.product.id }}">
+            <button class="delete" type="submit">
+                <i class="fa fa-close"></i>
+            </button>
+        </form>
+    </div>
+{% empty %}
+    <div class="empty-cart">Your cart is empty</div>
+{% endfor %}

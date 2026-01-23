@@ -55,12 +55,20 @@ class Cart:
         product_ids = self.cart.keys()
         # get the product objects and add them to the cart
         products = Product.objects.filter(id__in=product_ids)
+
         cart = self.cart.copy()
         for product in products:
-            cart[str(product.pk)]["product"] = product
+            main_image = product.images.filter(is_main_photo=True).first()
+            cart[str(product.pk)]["product"] = {
+                "id": product.id,
+                "name": product.name,
+                "price": str(product.price),
+                "main_image_url": main_image.photo.url if main_image else None,
+            }
+
         for item in cart.values():
-            item["price"] = Decimal(item["price"])
-            item["total_price"] = Decimal(item["price"]) * item["quantity"]
+            item["price"] = str(item["price"])
+            item["total_price"] = str(item["price"] * item["quantity"])
             yield item
 
     def __len__(self) -> int:
