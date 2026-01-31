@@ -142,8 +142,10 @@
                                     <div class="cart-dropdown">
                                         <div class="cart-list" id="cart-items-container">{% include 'partials/cart_items.html' %}</div>
                                         <div class="cart-summary">
-                                            <small>{{ cart|length }} Item(s) selected</small>
-                                            <h5>SUBTOTAL: {{ cart.get_total_price }}</h5>
+                                            <small class="cart-count-text">{{ cart|length }} Item(s) selected</small>
+                                            <h5>
+                                                SUBTOTAL: <span class="cart-total">{{ cart.get_total_price }}</span>
+                                            </h5>
                                         </div>
                                         <div class="cart-btns">
                                             {% if checkout_enabled %}
@@ -399,5 +401,6 @@
             <script src="{% static "dashboard/js/nouislider.min.js" %}"></script>
             <script src="{% static "dashboard/js/jquery.zoom.min.js" %}"></script>
             <script src="{% static "dashboard/js/main.js" %}"></script>
+            {% block extra_js %}{% endblock %}
         </body>
     </html>

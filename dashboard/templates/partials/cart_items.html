@@ -11,10 +11,12 @@
                 <span class="qty">{{ cart_item.quantity }}x</span>{{ cart_item.product.price }}
             </h4>
         </div>
-        <form action="{% url "product-remove" %}" method="post">
+        <form class="remove-from-cart-form"
+              action="{% url "product-remove" %}"
+              method="post">
             {% csrf_token %}
             <input type="hidden" name="product_id" value="{{ cart_item.product.id }}">
-            <button class="delete" type="submit">
+            <button class="delete remove-from-cart-btn" type="submit">
                 <i class="fa fa-close"></i>
             </button>
         </form>
