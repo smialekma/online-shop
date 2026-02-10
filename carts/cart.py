@@ -24,7 +24,7 @@ class Cart:
     def save(self) -> None:
         self.session.modified = True
 
-    def add(
+    def upsert(
         self, product: Product, quantity: int = 1, override_quantity: bool = False
     ) -> None:
         product_id = str(product.pk)
@@ -45,26 +45,42 @@ class Cart:
 
         self.save()
 
-    def remove(self, product: Product) -> None:
-        product_id = str(product.pk)
+    def remove(self, product_id: int) -> None:
+        product_id = str(product_id)
         if product_id in self.cart:
             del self.cart[product_id]
         self.save()
+
+    def get_item(self, product_id: int):
+        return self.cart.get(str(product_id))
 
     def __iter__(self) -> Iterator[CartItem]:
         product_ids = self.cart.keys()
         # get the product objects and add them to the cart
         products = Product.objects.filter(id__in=product_ids)
+
         cart = self.cart.copy()
         for product in products:
-            cart[str(product.pk)]["product"] = product
+            main_image = product.images.filter(is_main_photo=True).first()
+            cart[str(product.pk)]["product"] = {
+                "id": product.id,
+                "name": product.name,
+                "price": str(product.price),
+                "main_image_url": main_image.photo.url if main_image else None,
+            }
+
         for item in cart.values():
-            item["price"] = Decimal(item["price"])
-            item["total_price"] = Decimal(item["price"]) * item["quantity"]
+            item["total_price"] = str(
+                float(item["product"]["price"]) * item["quantity"]
+            )
+            item["price"] = str(item["product"]["price"])
             yield item
 
     def __len__(self) -> int:
         return sum(item["quantity"] for item in self.cart.values())
+
+    def count_unique_items(self) -> int:
+        return len(self.cart)
 
     def get_sub_total_price(self) -> Decimal:
         return Decimal(

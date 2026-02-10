@@ -137,38 +137,15 @@
                                     <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                                         <i class="fa fa-shopping-cart"></i>
                                         <span>Your Cart</span>
-                                        <div class="qty">{{ cart|length }}</div>
+                                        <div class="qty cart-count">{{ cart|length }}</div>
                                     </a>
                                     <div class="cart-dropdown">
-                                        <div class="cart-list">
-                                            {% for cart_item in cart %}
-                                                <div class="product-widget">
-                                                    <div class="product-img">
-                                                        {% for photo in cart_item.product.images.all %}
-                                                            {% if photo.is_main_photo is True %}<img src="{{ photo.photo.url }}" alt="">{% endif %}
-                                                        {% endfor %}
-                                                    </div>
-                                                    <div class="product-body">
-                                                        <h3 class="product-name">
-                                                            <a href="{% url "detail-view" cart_item.product.id %}">{{ cart_item.product.name }}</a>
-                                                        </h3>
-                                                        <h4 class="product-price">
-                                                            <span class="qty">{{ cart_item.quantity }}x</span>{{ cart_item.product.price }}
-                                                        </h4>
-                                                    </div>
-                                                    <form action="{% url "product-remove" %}" method="post">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="product_id" value="{{ cart_item.product.id }}">
-                                                        <button class="delete" type="submit">
-                                                            <i class="fa fa-close"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
+                                        <div class="cart-list" id="cart-items-container">{% include 'partials/cart_items.html' %}</div>
                                         <div class="cart-summary">
-                                            <small>{{ cart|length }} Item(s) selected</small>
-                                            <h5>SUBTOTAL: {{ cart.get_total_price }}</h5>
+                                            <small class="cart-count-text">{{ cart|length }} Item(s) selected</small>
+                                            <h5>
+                                                SUBTOTAL: <span class="cart-total">{{ cart.get_total_price }}</span>
+                                            </h5>
                                         </div>
                                         <div class="cart-btns">
                                             {% if checkout_enabled %}
@@ -424,5 +401,6 @@
             <script src="{% static "dashboard/js/nouislider.min.js" %}"></script>
             <script src="{% static "dashboard/js/jquery.zoom.min.js" %}"></script>
             <script src="{% static "dashboard/js/main.js" %}"></script>
+            {% block extra_js %}{% endblock %}
         </body>
     </html>

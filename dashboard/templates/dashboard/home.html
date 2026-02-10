@@ -1,4 +1,5 @@
 {% extends "dashboard/base.html" %}
+{% load static %}
 {% block content %}
     <!-- SECTION -->
     <div class="section">
@@ -123,9 +124,14 @@
                                                             </div>
                                                         </div>
                                                         <div class="add-to-cart">
-                                                            <button class="add-to-cart-btn">
-                                                                <i class="fa fa-shopping-cart"></i> add to cart
-                                                            </button>
+                                                            <form class="add-to-cart-form" data-product-id="{{ product.id }}">
+                                                                {#                                        <form action="{% url "product-add" %}" method="post">#}
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                                                <button class="add-to-cart-btn" type="submit">
+                                                                    <i class="fa fa-shopping-cart"></i> add to cart
+                                                                </button>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                     <!-- /product -->
@@ -237,9 +243,14 @@
                                                                 </div>
                                                             </div>
                                                             <div class="add-to-cart">
-                                                                <button class="add-to-cart-btn">
-                                                                    <i class="fa fa-shopping-cart"></i> add to cart
-                                                                </button>
+                                                                <form class="add-to-cart-form" data-product-id="{{ product.id }}">
+                                                                    {#                                        <form action="{% url "product-add" %}" method="post">#}
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                                                    <button class="add-to-cart-btn" type="submit">
+                                                                        <i class="fa fa-shopping-cart"></i> add to cart
+                                                                    </button>
+                                                                </form>
                                                             </div>
                                                         </div>
                                                         <!-- /product -->
@@ -389,4 +400,7 @@
                 <!-- /container -->
             </div>
             <!-- /SECTION -->
+        {% endblock %}
+        {% block extra_js %}
+            <script src="{% static "dashboard/js/cart.js" %}"></script>
         {% endblock %}

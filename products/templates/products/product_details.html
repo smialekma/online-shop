@@ -1,4 +1,5 @@
 {% extends "dashboard/base.html" %}
+{% load static %}
 {% load product_tags %}
 {% block content %}
     <!-- BREADCRUMB -->
@@ -97,17 +98,23 @@
                             </label>
                         </div>
                         <div class="add-to-cart">
-                            <div class="qty-label">
-                                Qty
-                                <div class="input-number">
-                                    <input type="number">
-                                    <span class="qty-up">+</span>
-                                    <span class="qty-down">-</span>
+                            <form action="{% url "detail-add" product.id %}"
+                                  method="post"
+                                  class="cart-qty-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="product_id" value="{{ product.id }}">
+                                <div class="qty-label">
+                                    Qty
+                                    <div class="input-number">
+                                        <input type="number" name="quantity" value="1" min="1" class="qty-input">
+                                        <span class="qty-up">+</span>
+                                        <span class="qty-down">-</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <button class="add-to-cart-btn">
-                                <i class="fa fa-shopping-cart"></i> add to cart
-                            </button>
+                                <button type="submit" class="add-to-cart-btn">
+                                    <i class="fa fa-shopping-cart"></i> add to cart
+                                </button>
+                            </form>
                         </div>
                         {% if product.id not in wishlist_items %}
                             <div class="product-btns">
@@ -117,6 +124,17 @@
                                     <button type="submit" class="add-to-wishlist">
                                         <i class="fa fa-heart-o"></i>
                                         <span class="product-btn-text">add to wishlist</span>
+                                    </button>
+                                </form>
+                            </div>
+                        {% else %}
+                            <div class="product-btns">
+                                <form action="{% url 'wishlist-remove' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <button type="submit" class="add-to-wishlist">
+                                        <i class="fa fa-heart"></i>
+                                        <span class="product-btn-text">remove from wishlist</span>
                                     </button>
                                 </form>
                             </div>
@@ -423,7 +441,7 @@
                                     {% endfor %}
                                 </div>
                                 <div class="product-btns">
-                                    {% if product.id in wishlist_items %}
+                                    {% if item.product.id in wishlist_items %}
                                         <i class="fa fa-heart"></i>
                                     {% else %}
                                         <form action="{% url "wishlist-add" %}" method="post">
@@ -437,9 +455,14 @@
                                 </div>
                             </div>
                             <div class="add-to-cart">
-                                <button class="add-to-cart-btn">
-                                    <i class="fa fa-shopping-cart"></i> add to cart
-                                </button>
+                                <form class="add-to-cart-form" data-product-id="{{ item.product.id }}">
+                                    {#                                        <form action="{% url "product-add" %}" method="post">#}
+                                    {% csrf_token %}
+                                    <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                    <button class="add-to-cart-btn" type="submit">
+                                        <i class="fa fa-shopping-cart"></i> add to cart
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -491,4 +514,7 @@
     });
 
     </script>
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static "dashboard/js/cart.js" %}"></script>
 {% endblock %}
