@@ -32,7 +32,7 @@ class CartView(TemplateView):
 
 
 @require_POST
-def cart_update(request):
+def cart_update(request: HttpRequest) -> JsonResponse:
     data = json.loads(request.body)
     product_id = str(data.get("product_id"))
     requested_qty = int(data.get("quantity", 0))
