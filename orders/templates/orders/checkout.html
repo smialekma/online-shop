@@ -11,7 +11,7 @@
                     <h3 class="breadcrumb-header">Checkout</h3>
                     <ul class="breadcrumb-tree">
                         <li>
-                            <a href="#">Home</a>
+                            <a href="{% url "home-view" %}">Home</a>
                         </li>
                         <li class="active">Checkout</li>
                     </ul>
@@ -40,16 +40,6 @@
                             {% for field in form %}
                                 {% if field.name != 'shipping_method' %}{{ field|as_crispy_field }}{% endif %}
                             {% endfor %}
-                            {#                            <div class="input-checkbox">#}
-                            {#                                {{ form.agree }}#}
-                            {#                                <label for="{{ form.agree.id_for_label }}">#}
-                            {#                                    <span></span>#}
-                            {#                                I've read and accept the <a href="#" target="_blank">terms & conditions</a>*#}
-                            {#                                </label>#}
-                            {#                                {% if form.agree.errors %}#}
-                            {#                                  <div>{{ form.agree.errors }}</div>#}
-                            {#                                {% endif %}#}
-                            {#                            </div>#}
                         </div>
                     </div>
                     <!-- /Billing Details -->
@@ -71,7 +61,7 @@
                                 {% for cart_item in cart %}
                                     <div class="order-col">
                                         <div>{{ cart_item.quantity }}x {{ cart_item.product.name }}</div>
-                                        <div>{{ cart_item.total_price }}</div>
+                                        <div>{{ cart_item.total_price | floatformat:2 }}</div>
                                     </div>
                                 {% endfor %}
                             </div>

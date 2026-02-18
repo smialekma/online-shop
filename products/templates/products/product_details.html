@@ -63,14 +63,14 @@
                         <div>
                             <div class="product-rating">
                                 {% for number in rating_options %}
-                                    {% if number > review_aggregations.average_rating %}
+                                    {% if number > review_aggregations.average_rating or not review_aggregations.average_rating %}
                                         <i class="fa fa-star-o"></i>
                                     {% else %}
                                         <i class="fa fa-star"></i>
                                     {% endif %}
                                 {% endfor %}
                             </div>
-                            <a class="review-link" href="#">{{ review_aggregations.review_count }} Review(s) | Add your review</a>
+                            <a class="review-link" data-toggle="tab" href="#tab3">{{ review_aggregations.review_count }} Review(s) | Add your review</a>
                         </div>
                         <div>
                             {% if product.is_sale %}
@@ -80,22 +80,11 @@
                             {% else %}
                                 <h3 class="product-price">{{ product.price }}</h3>
                             {% endif %}
-                            {% if product.quantity > 0 %}<span class="product-available">In Stock</span>{% endif %}
-                        </div>
-                        <p>{{ product.description }}</p>
-                        <div class="product-options">
-                            <label>
-                                Size
-                                <select class="input-select">
-                                    <option value="0">X</option>
-                                </select>
-                            </label>
-                            <label>
-                                Color
-                                <select class="input-select">
-                                    <option value="0">Red</option>
-                                </select>
-                            </label>
+                            {% if product.quantity > 0 %}
+                                <span class="product-available">In Stock</span>
+                            {% else %}
+                                <span class="product-available">Out Of Stock</span>
+                            {% endif %}
                         </div>
                         <div class="add-to-cart">
                             <form action="{% url "detail-add" product.id %}"
@@ -209,7 +198,7 @@
                                                 <span>{{ review_aggregations.average_rating|floatformat:"1" }}</span>
                                                 <div class="rating-stars">
                                                     {% for number in rating_options %}
-                                                        {% if number > review_aggregations.average_rating %}
+                                                        {% if number > review_aggregations.average_rating  or not review_aggregations.average_rating %}
                                                             <i class="fa fa-star-o"></i>
                                                         {% else %}
                                                             <i class="fa fa-star"></i>
@@ -416,7 +405,7 @@
                                     {% if item.product.is_sale %}
                                         <span class="sale">-{{ item.product.sale_percentage }}%</span>
                                     {% endif %}
-                                    {% if item.product.newer_than_x_days %}<span class="new">NEW</span>{% endif %}
+                                    {% if item.product.is_new %}<span class="new">NEW</span>{% endif %}
                                 </div>
                             </div>
                             <div class="product-body">
@@ -433,7 +422,7 @@
                                 {% endif %}
                                 <div class="product-rating">
                                     {% for number in rating_options %}
-                                        {% if number > item.product.average_rating %}
+                                        {% if number > item.product.average_rating or not item.product.average_rating %}
                                             <i class="fa fa-star-o"></i>
                                         {% else %}
                                             <i class="fa fa-star"></i>
@@ -442,7 +431,13 @@
                                 </div>
                                 <div class="product-btns">
                                     {% if item.product.id in wishlist_items %}
-                                        <i class="fa fa-heart"></i>
+                                        <form action="{% url "wishlist-remove" %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                            <button class="add-to-wishlist" type="submit">
+                                                <i class="fa fa-heart"></i><span class="tooltipp">remove from wishlist</span>
+                                            </button>
+                                        </form>
                                     {% else %}
                                         <form action="{% url "wishlist-add" %}" method="post">
                                             {% csrf_token %}
@@ -455,8 +450,9 @@
                                 </div>
                             </div>
                             <div class="add-to-cart">
-                                <form class="add-to-cart-form" data-product-id="{{ item.product.id }}">
-                                    {#                                        <form action="{% url "product-add" %}" method="post">#}
+                                <form class="add-to-cart-form"
+                                      action="{% url "detail-add" item.product.id %}"
+                                      method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="product_id" value="{{ item.product.id }}">
                                     <button class="add-to-cart-btn" type="submit">
@@ -514,7 +510,4 @@
     });
 
     </script>
-{% endblock %}
-{% block extra_js %}
-    <script src="{% static "dashboard/js/cart.js" %}"></script>
 {% endblock %}

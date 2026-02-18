@@ -1,4 +1,5 @@
 import django_filters
+from django.db.models import QuerySet
 from django.forms import DateInput
 
 from product_reviews.models import Review
@@ -35,6 +36,6 @@ class ReviewManagementFilter(django_filters.FilterSet):
             "date_to",
         ]
 
-    def filter_search(self, queryset, name, value):
+    def filter_search(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         """Search in username."""
         return queryset.filter(author__username__icontains=value)

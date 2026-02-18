@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from django.views.generic import ListView
 from django_filters.views import FilterView
 
@@ -29,21 +30,14 @@ class OrderManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = OrderManagementFilter
     context_object_name = "orders"
     ordering = "-created_at"
-    paginate_by = 5
+    paginate_by = 20
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = super().get_queryset()
 
         queryset = queryset.select_related("customer")
 
         return queryset
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-
-        print(context_data)
-
-        return context_data
 
 
 class BrandManagementListView(ManagementBaseView, FilterView, ListView):
@@ -52,7 +46,7 @@ class BrandManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = BrandManagementFilter
     context_object_name = "brands"
     ordering = "name"
-    paginate_by = 5
+    paginate_by = 20
 
 
 class CategoryManagementListView(ManagementBaseView, FilterView, ListView):
@@ -61,7 +55,7 @@ class CategoryManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = CategoryManagementFilter
     context_object_name = "categories"
     ordering = "-name"
-    paginate_by = 5
+    paginate_by = 20
 
 
 class ReviewManagementListView(ManagementBaseView, FilterView, ListView):
@@ -70,9 +64,9 @@ class ReviewManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = ReviewManagementFilter
     context_object_name = "reviews"
     ordering = "-created_at"
-    paginate_by = 5
+    paginate_by = 20
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = super().get_queryset()
 
         queryset = queryset.select_related("author").select_related("product")
@@ -86,9 +80,9 @@ class PaymentManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = PaymentManagementFilter
     context_object_name = "payments"
     ordering = "-created_at"
-    paginate_by = 5
+    paginate_by = 20
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = super().get_queryset()
 
         queryset = queryset.select_related("order")
@@ -102,9 +96,9 @@ class ProductManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = ProductManagementFilter
     context_object_name = "products"
     ordering = "-date_added"
-    paginate_by = 5
+    paginate_by = 20
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = super().get_queryset()
 
         queryset = queryset.select_related("brand").select_related("category")
@@ -118,7 +112,7 @@ class ShippingMethodManagementListView(ManagementBaseView, FilterView, ListView)
     filterset_class = ShippingMethodManagementFilter
     context_object_name = "methods"
     ordering = "-name"
-    paginate_by = 5
+    paginate_by = 20
 
 
 class UserManagementListView(ManagementBaseView, FilterView, ListView):
@@ -127,7 +121,7 @@ class UserManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = UserManagementFilter
     context_object_name = "users"
     ordering = "username"
-    paginate_by = 5
+    paginate_by = 20
 
 
 class SubscriberManagementListView(ManagementBaseView, FilterView, ListView):
@@ -136,7 +130,7 @@ class SubscriberManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = SubscriberManagementFilter
     context_object_name = "subscribers"
     ordering = "-date_subscribed"
-    paginate_by = 5
+    paginate_by = 20
 
 
 class NewsletterManagementListView(ManagementBaseView, FilterView, ListView):
@@ -145,4 +139,4 @@ class NewsletterManagementListView(ManagementBaseView, FilterView, ListView):
     filterset_class = NewsletterManagementFilter
     context_object_name = "posts"
     ordering = "-created_at"
-    paginate_by = 5
+    paginate_by = 20

@@ -24,3 +24,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += debug_toolbar_urls()
     urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
+
+# handler404 = 'my_app.views.error_404'
+# handler500 = 'my_app.views.error_500'
+# handler403 = 'my_app.views.error_403'

@@ -10,6 +10,7 @@ class CartItem(TypedDict):
     quantity: int
     price: str
     total_price: float
+    product: dict[str, str | int | None]
 
 
 class Cart:
@@ -46,13 +47,14 @@ class Cart:
         self.save()
 
     def remove(self, product_id: int) -> None:
-        product_id = str(product_id)
-        if product_id in self.cart:
-            del self.cart[product_id]
+        product_id_str = str(product_id)
+        if product_id_str in self.cart:
+            del self.cart[product_id_str]
         self.save()
 
-    def get_item(self, product_id: int):
-        return self.cart.get(str(product_id))
+    def get_item(self, product_id: int) -> CartItem | None:
+        item: CartItem | None = self.cart.get(str(product_id))
+        return item
 
     def __iter__(self) -> Iterator[CartItem]:
         product_ids = self.cart.keys()

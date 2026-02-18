@@ -85,7 +85,7 @@
                                                                 {% if product.is_sale %}
                                                                     <span class="sale">-{{ product.sale_percentage }}%</span>
                                                                 {% endif %}
-                                                                {% if product.newer_than_x_days %}<span class="new">NEW</span>{% endif %}
+                                                                {% if product.is_new %}<span class="new">NEW</span>{% endif %}
                                                             </div>
                                                         </div>
                                                         <div class="product-body">
@@ -102,7 +102,7 @@
                                                             {% endif %}
                                                             <div class="product-rating">
                                                                 {% for number in rating_options %}
-                                                                    {% if number > product.average_rating %}
+                                                                    {% if number > product.average_rating or not product.average_rating %}
                                                                         <i class="fa fa-star-o"></i>
                                                                     {% else %}
                                                                         <i class="fa fa-star"></i>
@@ -111,7 +111,13 @@
                                                             </div>
                                                             <div class="product-btns">
                                                                 {% if product.id in wishlist_items %}
-                                                                    <i class="fa fa-heart"></i>
+                                                                    <form action="{% url "wishlist-remove" %}" method="post">
+                                                                        {% csrf_token %}
+                                                                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                                                                        <button class="add-to-wishlist" type="submit">
+                                                                            <i class="fa fa-heart"></i><span class="tooltipp">remove from wishlist</span>
+                                                                        </button>
+                                                                    </form>
                                                                 {% else %}
                                                                     <form action="{% url "wishlist-add" %}" method="post">
                                                                         {% csrf_token %}
@@ -161,7 +167,7 @@
                     <!-- section title -->
                     <div class="col-md-12">
                         <div class="section-title">
-                            <h3 class="title">Top selling</h3>
+                            <h3 class="title">Top-selling</h3>
                             <div class="section-nav">
                                 <ul class="section-tab-nav tab-nav">
                                     {% for category in categories %}
@@ -202,9 +208,9 @@
                                                                 {% endfor %}
                                                                 <div class="product-label">
                                                                     {% if product.is_sale %}
-                                                                        <span class="sale">-{{ product.sale_percentage }}%</span>
+                                                                        <span class="sale">{{ product.sale_percentage }}%</span>
                                                                     {% endif %}
-                                                                    {% if product.newer_than_x_days %}<span class="new">NEW</span>{% endif %}
+                                                                    {% if product.is_new %}<span class="new">NEW</span>{% endif %}
                                                                 </div>
                                                             </div>
                                                             <div class="product-body">
@@ -221,7 +227,7 @@
                                                                 {% endif %}
                                                                 <div class="product-rating">
                                                                     {% for number in rating_options %}
-                                                                        {% if number > product.average_rating %}
+                                                                        {% if number > product.average_rating or not product.average_rating %}
                                                                             <i class="fa fa-star-o"></i>
                                                                         {% else %}
                                                                             <i class="fa fa-star"></i>
@@ -230,7 +236,13 @@
                                                                 </div>
                                                                 <div class="product-btns">
                                                                     {% if product.id in wishlist_items %}
-                                                                        <i class="fa fa-heart"></i>
+                                                                        <form action="{% url "wishlist-remove" %}" method="post">
+                                                                            {% csrf_token %}
+                                                                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                                                                            <button class="add-to-wishlist" type="submit">
+                                                                                <i class="fa fa-heart"></i><span class="tooltipp">remove from wishlist</span>
+                                                                            </button>
+                                                                        </form>
                                                                     {% else %}
                                                                         <form action="{% url "wishlist-add" %}" method="post">
                                                                             {% csrf_token %}

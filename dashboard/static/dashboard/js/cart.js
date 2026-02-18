@@ -14,11 +14,14 @@ function getCookie(name) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-            const forms = document.querySelectorAll('.add-to-cart-form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function(e) {
+            const products = document.querySelectorAll(".product")
+
+            products.forEach(product => {
+                product.addEventListener('submit', function(e) {
                     e.preventDefault();
+                    const form = product.querySelector(".add-to-cart-form")
                     const formData = new FormData(form);
+
                     const button = form.querySelector('.add-to-cart-btn');
 
                     button.disabled = true;
@@ -32,6 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         }
                     ).then(response => response.json()).then(data => {
+                            if (data.limited) {
+                                button.innerHTML = 'NO MORE IN STOCK';
+
+                                setTimeout(() => {
+                                    button.innerHTML = '<i class="fa fa-shopping-cart"></i> add to cart';
+                                    button.disabled = false;
+                                }, 2500);
+                            }
                         if (data.success) {
                             button.innerHTML = '<i class="fa fa-shopping-cart"></i> added!';
 
@@ -47,6 +58,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             const cartCount = document.querySelector('.cart-count');
                             if (cartCount) {
                                 cartCount.textContent = data.cart_count
+                            }
+
+                            const cartDisabled = document.getElementById("view-cart-btn");
+                            if (cartDisabled) {
+                                cartDisabled.classList.toggle("disabled", data.cart_count === 0)
+                                cartDisabled.setAttribute("aria-disabled", data.cart_count === 0);
+                            }
+
+                            const checkoutDisabled = document.getElementById("checkout-btn");
+                            if (checkoutDisabled) {
+                                checkoutDisabled.classList.toggle("disabled", data.cart_count === 0)
+                                checkoutDisabled.setAttribute("aria-disabled", data.cart_count === 0);
                             }
 
                             const cartContainer = document.getElementById('cart-items-container');
@@ -102,6 +125,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             const cartTotal = document.querySelector('.cart-total');
                             if (cartTotal && data.cart_total) {
                                 cartTotal.textContent = data.cart_total;
+                            }
+
+                            const cartDisabled = document.getElementById("view-cart-btn");
+                            if (cartDisabled) {
+                                cartDisabled.classList.toggle("disabled", data.cart_count === 0)
+                                cartDisabled.setAttribute("aria-disabled", data.cart_count === 0);
+                            }
+
+                            const checkoutDisabled = document.getElementById("checkout-btn");
+                            if (checkoutDisabled) {
+                                checkoutDisabled.classList.toggle("disabled", data.cart_count === 0)
+                                checkoutDisabled.setAttribute("aria-disabled", data.cart_count === 0);
                             }
 
                             const cartContainer = document.getElementById('cart-items-container');
@@ -166,6 +201,18 @@ document.addEventListener("DOMContentLoaded", () => {
                             const cartTotal = document.querySelector('.cart-total');
                             if (cartTotal && data.cart_total) {
                                 cartTotal.textContent = data.cart_total;
+                            }
+
+                            const cartDisabled = document.getElementById("view-cart-btn");
+                            if (cartDisabled) {
+                                cartDisabled.classList.toggle("disabled", data.cart_count === 0)
+                                cartDisabled.setAttribute("aria-disabled", data.cart_count === 0);
+                            }
+
+                            const checkoutDisabled = document.getElementById("checkout-btn");
+                            if (checkoutDisabled) {
+                                checkoutDisabled.classList.toggle("disabled", data.cart_count === 0)
+                                checkoutDisabled.setAttribute("aria-disabled", data.cart_count === 0);
                             }
 
                             const cartContainer = document.getElementById('cart-items-container');

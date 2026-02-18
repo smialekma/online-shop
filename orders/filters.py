@@ -1,9 +1,10 @@
 import django_filters
+from django.db.models import QuerySet
+
 from .models import Order
 
 
 class OrderFilter(django_filters.FilterSet):
-    # Filtrowanie po statusie płatności (Paid/Unpaid)
     STATUS_CHOICES = (
         ("paid", "Paid"),
         ("unpaid", "Unpaid"),
@@ -12,10 +13,8 @@ class OrderFilter(django_filters.FilterSet):
         method="filter_by_status", choices=STATUS_CHOICES, label=""
     )
 
-    # Wyszukiwanie (po emailu lub notatkach)
     search = django_filters.CharFilter(method="filter_search", label="")
 
-    # Sortowanie po dacie i kwocie
     order_by = django_filters.OrderingFilter(
         label="",
         fields=[
@@ -30,9 +29,8 @@ class OrderFilter(django_filters.FilterSet):
 
     class Meta:
         model = Order
-        fields = []
 
-    def filter_by_status(self, queryset, name, value):
+    def filter_by_status(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         value = value.lower()
         if value == "paid":
             return queryset.filter(payments__is_paid=True).distinct()
@@ -43,5 +41,5 @@ class OrderFilter(django_filters.FilterSet):
             # return queryset.exclude(payments__is_paid=True).distinct()
         return queryset
 
-    def filter_search(self, queryset, name, value):
+    def filter_search(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         return queryset.filter(order_items__product__name__icontains=value)

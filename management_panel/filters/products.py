@@ -1,5 +1,7 @@
+from typing import Any
+
 import django_filters
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from products.models import Category, Brand, Product
 
@@ -28,12 +30,12 @@ class ProductManagementFilter(django_filters.FilterSet):
             "is_sale",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
         self.filters["brand"].queryset = Brand.objects.all().order_by("name")
         self.filters["category"].queryset = Category.objects.all().order_by("name")
 
-    def filter_search(self, queryset, name, value):
+    def filter_search(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         """Search by product name or description (case-insensitive)."""
         return queryset.filter(
             Q(name__icontains=value) | Q(description__icontains=value)

@@ -1,4 +1,5 @@
 import django_filters
+from django.db.models import QuerySet
 from django.forms import DateInput
 
 from newsletter.models import NewsletterPost
@@ -33,5 +34,5 @@ class NewsletterManagementFilter(django_filters.FilterSet):
             "date_to",
         ]
 
-    def filter_search(self, queryset, name, value):
+    def filter_search(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         return queryset.filter(title__icontains=value)

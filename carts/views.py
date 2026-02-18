@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -10,20 +11,20 @@ from django.views.generic import TemplateView, View
 
 from carts.cart import Cart
 from products.models import Product
+from products.views import _get_available_amount_of_product
 
 
 class CartView(TemplateView):
     template_name = "carts/cart.html"
 
-    def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context_data: dict[str, Any] = super().get_context_data(**kwargs)
         cart = Cart(self.request)
         cart_items = list(cart)
 
-        paginator = Paginator(cart_items, 3)
+        paginator = Paginator(cart_items, 12)
         page_number = self.request.GET.get("page", 1)
         page_obj = paginator.get_page(page_number)
-        print(f"Total pages: {paginator.num_pages}")
         context_data["page_obj"] = page_obj
         context_data["paginator"] = paginator
         context_data["products"] = page_obj
@@ -44,15 +45,17 @@ def cart_update(request: HttpRequest) -> JsonResponse:
     except Product.DoesNotExist:
         return JsonResponse({"error": "Product not found"}, status=404)
 
-    max_stock = product.quantity
+    available_qty = _get_available_amount_of_product(
+        cart, product, requested_qty, return_cart_qty=True
+    )
 
     # stock limit
-    if requested_qty > max_stock:
-        cart.upsert(product, max_stock, True)
+    if available_qty < requested_qty:
+        cart.upsert(product, available_qty, True)
         return JsonResponse(
             {
                 "limited": True,
-                "quantity": max_stock,
+                "quantity": available_qty,
                 "message": "Not enough stock available",
             }
         )

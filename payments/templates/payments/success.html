@@ -17,12 +17,14 @@
         <p>We’ve sent a confirmation email with your order details.</p>
                 {% endcomment %}
                 <div class="form-group" style="margin-top: 30px;">
-                    <a href="{% url "home-view" %}"
+                    <a href="{% url "product-view" %}"
                        class="primary-btn"
                        style="width: 100%;
                               margin-bottom: 15px">Continue Shopping</a>
                     {% if user.is_authenticated %}
-                        <a href="#" class="primary-btn" style="width: 100%;">View My Orders</a>
+                        <a href="{% url "order-history-view" %}"
+                           class="primary-btn"
+                           style="width: 100%">View My Orders</a>
                     {% endif %}
                 </div>
             </div>

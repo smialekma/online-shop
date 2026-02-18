@@ -6,7 +6,7 @@ from celery import shared_task
 
 
 @shared_task
-def send_newsletter():
+def send_newsletter() -> None:
     active_subscribers = Subscriber.objects.filter(is_active=True)
     post_to_send = (
         NewsletterPost.objects.filter(is_published=False, to_publish=True)

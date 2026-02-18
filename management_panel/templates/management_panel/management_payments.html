@@ -71,7 +71,7 @@
                         <th style="padding:10px 8px;">Status</th>
                         <th style="padding:10px 8px;">Amount</th>
                         <th style="padding:10px 8px;">Date</th>
-                        <th style="padding:10px 8px;">Actions</th>
+                        <th style="padding:12px 20px; text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,7 +84,7 @@
                             <td style="padding:12px 8px;color:#D10024;font-weight:700;">{{ payment.amount }}</td>
                             <td style="padding:12px 8px;">{{ payment.created_at|date:"d-m-Y" }}</td>
                             <td style="padding:12px 8px;text-align:right;">
-                                <a href="#"
+                                <a href="{% url "management-payments-update" payment.pk %}"
                                    class="primary-btn"
                                    style="padding:6px 12px;
                                           border-radius:20px;

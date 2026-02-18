@@ -1,11 +1,17 @@
-from typing import List
+from typing import cast
 
 import stripe
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from stripe.checkout import Session
 from django.core.mail import EmailMessage
+from django.db import transaction
+from django.db.models import F
+from stripe.params.checkout import (
+    SessionCreateParamsShippingOption,
+    SessionCreateParamsLineItem,
+)
 
 from core import settings
 from orders.models import Order
@@ -14,7 +20,7 @@ from payments.models import Payment
 
 class StripePaymentProvider:
 
-    def __init__(self, request, order_id=None):
+    def __init__(self, request: HttpRequest, order_id: int | None = None) -> None:
         self.order_id = order_id
         self.request = request
 
@@ -23,14 +29,14 @@ class StripePaymentProvider:
             self.order = order
 
     def _get_order(self) -> Order:
-        order = (
+        order: Order = (
             Order.objects.prefetch_related("order_items")
             .select_related("shipping_method")
             .get(id=self.order_id)
         )
         return order
 
-    def _create_line_items(self) -> List[dict]:
+    def _create_line_items(self) -> list[SessionCreateParamsLineItem]:
         line_items = []
 
         for order_item in self.order.order_items.all():
@@ -49,9 +55,9 @@ class StripePaymentProvider:
                 }
             )
 
-        return line_items
+        return cast(list[SessionCreateParamsLineItem], line_items)
 
-    def _create_shipping_option(self) -> List[dict]:
+    def _create_shipping_option(self) -> list[SessionCreateParamsShippingOption]:
         method = self.order.shipping_method
 
         order_amount = int(method.price * 100)
@@ -73,36 +79,54 @@ class StripePaymentProvider:
             },
         ]
 
-        return shipping_options
+        return cast(list[SessionCreateParamsShippingOption], shipping_options)
 
     def _create_new_payment(self, session_object: Session) -> None:
-        amount = session_object.amount_total / 100
+        if session_object.amount_total:
+            amount = int(session_object.amount_total) / 100
 
-        Payment.objects.create(
-            stripe_checkout_id=session_object.id,
-            order=self.order,
-            amount=amount,
-            is_paid=False,
-        )
+            Payment.objects.create(
+                stripe_checkout_id=session_object.id,
+                order=self.order,
+                amount=amount,
+                is_paid=False,
+            )
+        else:
+            raise TypeError("Session_object.amount_total is None, but should be int")
 
     def _handle_payment_intent_succeeded(
         self, payment_intent_id: str, payment: Payment
     ) -> None:
         payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
         payment_method_id = payment_intent.payment_method
-        payment_method = stripe.PaymentMethod.retrieve(payment_method_id)
-        payment_method_type = payment_method.get("type")
-        payment.payment_method = payment_method_type
-        payment.save()
+
+        if payment_method_id is str:
+            payment_method_id_str: str = str(payment_method_id)
+            payment_method = stripe.PaymentMethod.retrieve(payment_method_id_str)
+            payment_method_type = payment_method.get("type")
+            payment.payment_method = payment_method_type
+            payment.save()
+        else:
+            raise TypeError(
+                "Retrieved variable is of incorrect type: payment_method_id"
+            )
 
     def _handle_checkout_session_completed(
         self, checkout_session_id: str, username: str
     ) -> Payment:
-        payment = Payment.objects.select_related("order").get(
-            stripe_checkout_id=checkout_session_id
-        )
-        payment.is_paid = True
-        payment.save()
+        with transaction.atomic():
+            payment: Payment = (
+                Payment.objects.select_related("order")
+                .prefetch_related("order__order_items")
+                .prefetch_related("order__order_items__product")
+                .get(stripe_checkout_id=checkout_session_id)
+            )
+            payment.is_paid = True
+            payment.save()
+
+            for item in payment.order.order_items.all():
+                item.product.quantity = F("quantity") - item.quantity
+                item.product.save(updated_fields=["quantity"])
 
         self.order_id = payment.order.pk
         email = payment.order.email
@@ -111,7 +135,7 @@ class StripePaymentProvider:
 
         return payment
 
-    def create_checkout_session(self) -> str:
+    def create_checkout_session(self) -> str | None:
         line_items = self._create_line_items()
 
         shipping_option = self._create_shipping_option()
@@ -119,7 +143,7 @@ class StripePaymentProvider:
         session = stripe.checkout.Session.create(
             shipping_options=shipping_option,
             customer_email=(
-                self.request.user.email if self.request.user.is_authenticated else None
+                self.request.user.email if self.request.user.is_authenticated else ""
             ),
             line_items=line_items,
             mode="payment",
@@ -133,7 +157,7 @@ class StripePaymentProvider:
                 "username": (
                     self.request.user.username
                     if self.request.user.is_authenticated
-                    else None
+                    else ""
                 )
             },
         )
@@ -150,8 +174,7 @@ class StripePaymentProvider:
 
         try:
             event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
-        except stripe.error.SignatureVerificationError as e:
-            print("⚠️  Webhook signature verification failed." + str(e))
+        except stripe.SignatureVerificationError:
             return HttpResponse(status=400)
 
         # Handle the event
@@ -168,7 +191,7 @@ class StripePaymentProvider:
             self._handle_payment_intent_succeeded(payment_intent_id, payment)
 
         else:
-            print("Unhandled event type {}".format(event.type))
+            raise Exception("Unhandled event type {}".format(event.type))
 
         return HttpResponse(status=200)
 

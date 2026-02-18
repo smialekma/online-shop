@@ -1,15 +1,26 @@
-from django.test import TestCase
+from django.test import TestCase, tag, override_settings
 from ..factories import ProductFactory
 from django.urls import reverse
+import shutil
+import tempfile
+
+TEMP_MEDIA = tempfile.mkdtemp()
 
 
+@tag("x")
+@override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class ProductViewTestCase(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         ProductFactory.create_batch(10)
         # tworzysz usera
         # self.client.login(user)
 
-    def test_only_get_allowed(self):
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(TEMP_MEDIA)
+        super().tearDownClass()
+
+    def test_only_get_allowed(self) -> None:
         response = self.client.post(reverse("product-view"))
         self.assertEqual(response.status_code, 405)
 
@@ -22,7 +33,7 @@ class ProductViewTestCase(TestCase):
         response = self.client.get(reverse("product-view"))
         self.assertEqual(response.status_code, 200)
 
-    def test_product_view_return_products_without_filters(self):
+    def test_product_view_return_products_without_filters(self) -> None:
         response = self.client.get(reverse("product-view"))
 
         self.assertEqual(response.status_code, 200)
@@ -31,28 +42,28 @@ class ProductViewTestCase(TestCase):
         self.assertIn("filter", response.context)
         self.assertEqual(len(response.context["products"]), 3)
 
-    def test_product_view_pagination_first_page(self):
+    def test_product_view_pagination_first_page(self) -> None:
         pass
 
-    def test_product_view_pagination_second_page(self):
+    def test_product_view_pagination_second_page(self) -> None:
         pass
 
-    def test_product_view_pagination_last_page(self):
+    def test_product_view_pagination_last_page(self) -> None:
         pass
 
-    def test_product_view_ordering_by_date_added(self):
+    def test_product_view_ordering_by_date_added(self) -> None:
         pass
 
-    def test_product_view_top_selling_products(self):
+    def test_product_view_top_selling_products(self) -> None:
         pass
 
-    def test_product_view_with_filter_parameters(self):
+    def test_product_view_with_filter_parameters(self) -> None:
         pass
 
-    def test_product_view_products_have_avarage_rating_annotation(self):
+    def test_product_view_products_have_avarage_rating_annotation(self) -> None:
         pass
 
-    def test_product_view_invalid_page_numer(self):
+    def test_product_view_invalid_page_numer(self) -> None:
         pass
 
         # def setUp(self):

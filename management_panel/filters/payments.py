@@ -1,5 +1,5 @@
 import django_filters
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.forms import DateInput
 
 from payments.models import Payment
@@ -39,7 +39,7 @@ class PaymentManagementFilter(django_filters.FilterSet):
             "date_to",
         ]
 
-    def filter_by_status(self, queryset, name, value):
+    def filter_by_status(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         value = value.lower()
         if value == "paid":
             return queryset.filter(is_paid=True).distinct()
@@ -48,7 +48,7 @@ class PaymentManagementFilter(django_filters.FilterSet):
             # return queryset.exclude(payments__is_paid=True).distinct()
         return queryset
 
-    def filter_search(self, queryset, name, value):
+    def filter_search(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         """
         Search by Stripe checkout ID or related order number/ID.
         Adjust 'order__number' if your Order model uses that field.

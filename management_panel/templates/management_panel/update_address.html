@@ -31,16 +31,6 @@
                             <h3 class="title">Shipping address</h3>
                         </div>
                         {% for field in form %}{{ field|as_crispy_field }}{% endfor %}
-                        {#                            <div class="input-checkbox">#}
-                        {#                                {{ form.agree }}#}
-                        {#                                <label for="{{ form.agree.id_for_label }}">#}
-                        {#                                    <span></span>#}
-                        {#                                I've read and accept the <a href="#" target="_blank">terms & conditions</a>*#}
-                        {#                                </label>#}
-                        {#                                {% if form.agree.errors %}#}
-                        {#                                  <div>{{ form.agree.errors }}</div>#}
-                        {#                                {% endif %}#}
-                        {#                            </div>#}
                     </div>
                 </div>
                 <!-- /Billing Details -->

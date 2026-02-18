@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.core.management.base import BaseCommand
 
 # from icecream import ic
@@ -14,7 +16,7 @@ k[oj;pj
 
 
 class Command(BaseCommand):
-    def handle(self, *args, **options):
+    def handle(self, *args: tuple[Any], **options: dict[str, Any]) -> None:
         # customers = CustomerFactory.create_batch(10)
 
         # address = CustomerAddressFactory.create()
@@ -33,7 +35,5 @@ class Command(BaseCommand):
         new_address, created = CustomerAddress.objects.update_or_create(
             defaults=new_address, address_line=address_line
         )
-
-        print(created)
 
         pass

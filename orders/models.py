@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
@@ -8,12 +9,14 @@ from customer_addresses.models import CustomerAddress
 
 
 class ShippingMethod(models.Model):
-    name = models.CharField()
-    price = models.DecimalField(decimal_places=2, max_digits=5)
-    min_delivery_time_in_days = models.IntegerField()
-    max_delivery_time_in_days = models.IntegerField()
+    name: str | models.CharField = models.CharField()
+    price: float | Decimal | models.DecimalField = models.DecimalField(
+        decimal_places=2, max_digits=5
+    )
+    min_delivery_time_in_days: int | models.IntegerField = models.IntegerField()
+    max_delivery_time_in_days: int | models.IntegerField = models.IntegerField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def get_delivery_time_for_display(self) -> str:
@@ -24,28 +27,40 @@ class ShippingMethod(models.Model):
 
 
 class Order(models.Model):
-    customer = models.ForeignKey(
+    customer: models.ForeignKey = models.ForeignKey(
         Customer,
         related_name="orders",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    date_ordered = models.DateTimeField(default=timezone.now)
-    date_fulfilled = models.DateTimeField(blank=True, null=True)
-    address = models.ForeignKey(
+    date_ordered: datetime | models.DateTimeField = models.DateTimeField(
+        default=timezone.now
+    )
+    date_fulfilled: datetime | models.DateTimeField = models.DateTimeField(
+        blank=True, null=True
+    )
+    address: models.ForeignKey = models.ForeignKey(
         CustomerAddress,
         related_name="orders",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(blank=True, null=True)
-    total_amount = models.DecimalField(decimal_places=2, max_digits=8)
-    order_notes = models.TextField(max_length=300, blank=True, null=True)
-    email = models.EmailField()
-    shipping_method = models.ForeignKey(
+    created_at: datetime | models.DateTimeField = models.DateTimeField(
+        default=timezone.now
+    )
+    updated_at: datetime | models.DateTimeField = models.DateTimeField(
+        blank=True, null=True
+    )
+    total_amount: float | Decimal | models.DecimalField = models.DecimalField(
+        decimal_places=2, max_digits=8
+    )
+    order_notes: str | models.TextField = models.TextField(
+        max_length=300, blank=True, null=True
+    )
+    email: str | models.EmailField = models.EmailField()
+    shipping_method: models.ForeignKey = models.ForeignKey(
         ShippingMethod,
         related_name="orders",
         on_delete=models.SET_NULL,
@@ -54,8 +69,8 @@ class Order(models.Model):
     )
 
     @property
-    def is_paid(self):
-        return self.payments and self.payments.filter(is_paid=True).exists()
+    def is_paid(self) -> bool:
+        return self.payments.exists() and self.payments.filter(is_paid=True).exists()
 
     def get_status_for_display(self) -> str:
         if self.is_paid:
@@ -65,17 +80,17 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(
+    order: models.ForeignKey = models.ForeignKey(
         Order, related_name="order_items", on_delete=models.CASCADE
     )
-    product = models.ForeignKey(
+    product: models.ForeignKey = models.ForeignKey(
         "products.Product",
         related_name="order_items",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-    quantity = models.IntegerField()
+    quantity: int | models.IntegerField = models.IntegerField()
 
     def get_subtotal(self) -> Decimal:
         return Decimal(self.quantity * self.product.price)

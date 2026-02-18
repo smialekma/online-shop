@@ -1,5 +1,5 @@
 import django_filters
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 
 from customers.models import Customer
 
@@ -15,6 +15,6 @@ class UserManagementFilter(django_filters.FilterSet):
         model = Customer
         fields = ["search", "is_active", "is_manager"]
 
-    def filter_search(self, queryset, name, value):
+    def filter_search(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         """Search by product name or description (case-insensitive)."""
         return queryset.filter(Q(username__icontains=value) | Q(email__icontains=value))

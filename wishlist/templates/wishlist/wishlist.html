@@ -38,7 +38,7 @@
                                     <h4 class="product-price">{{ item.product.price }}</h4>
                                     <div class="product-rating">
                                         {% for number in rating_options %}
-                                            {% if number > item.average_rating %}
+                                            {% if number > item.average_rating or not item.average_rating %}
                                                 <i class="fa fa-star-o"></i>
                                             {% else %}
                                                 <i class="fa fa-star"></i>

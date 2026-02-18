@@ -59,7 +59,7 @@
                         <th style="padding:10px 8px;">Email</th>
                         <th style="padding:10px 8px;">Is active</th>
                         <th style="padding:10px 8px;">Date subscribed</th>
-                        <th style="padding:10px 8px;">Actions</th>
+                        <th style="padding:12px 20px; text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,7 +70,7 @@
                             <td style="padding:12px 8px;">{{ subscriber.is_active }}</td>
                             <td style="padding:12px 8px;color:#D10024;font-weight:700;">{{ subscriber.date_subscribed|date:"d-m-Y" }}</td>
                             <td style="padding:12px 8px;text-align:right;">
-                                <a href="#"
+                                <a href="{% url "management-subscribers-update" subscriber.pk %}"
                                    class="primary-btn"
                                    style="padding:6px 12px;
                                           border-radius:20px;

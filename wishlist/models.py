@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.utils import timezone
 
@@ -6,10 +8,12 @@ from products.models import Product
 
 
 class WishlistItem(models.Model):
-    customer = models.ForeignKey(
+    customer: models.ForeignKey = models.ForeignKey(
         Customer, related_name="wishlist_items", on_delete=models.CASCADE
     )
-    product = models.ForeignKey(
+    product: models.ForeignKey = models.ForeignKey(
         Product, related_name="wishlist_items", on_delete=models.CASCADE
     )
-    date_added = models.DateTimeField(default=timezone.now)
+    date_added: datetime | models.DateTimeField = models.DateTimeField(
+        default=timezone.now
+    )

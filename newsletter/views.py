@@ -1,6 +1,8 @@
 from django.contrib import messages
+from django.contrib.sites.requests import RequestSite
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
@@ -11,7 +13,7 @@ from newsletter.models import Subscriber
 from newsletter.tokens import newsletter_activation_token
 
 
-def subscribe_newsletter(request):
+def subscribe_newsletter(request: HttpRequest) -> HttpResponseRedirect:
     if request.method == "POST":
         form = NewsletterForm(request.POST)
         if form.is_valid():
@@ -31,7 +33,7 @@ def subscribe_newsletter(request):
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
-def _send_email(current_site, subscriber, email):
+def _send_email(current_site: RequestSite, subscriber: Subscriber, email: str) -> None:
     mail_subject = "Online Shop - activate your newsletter subscription"
     message = render_to_string(
         "newsletter/newsletter_activation_email.html",
@@ -43,11 +45,13 @@ def _send_email(current_site, subscriber, email):
         },
     )
     to_email = email
-    email = EmailMessage(mail_subject, message, to=[to_email])
-    email.send()
+    email_message = EmailMessage(mail_subject, message, to=[to_email])
+    email_message.send()
 
 
-def confirm_subscription(request, uidb64, token):
+def confirm_subscription(
+    request: HttpRequest, uidb64: str, token: str
+) -> HttpResponseRedirect:
     try:
         uid = urlsafe_base64_decode(uidb64)
         subscriber = Subscriber.objects.get(pk=uid)

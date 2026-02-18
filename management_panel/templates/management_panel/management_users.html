@@ -65,7 +65,7 @@
                         <th style="padding:10px 8px;">Email</th>
                         <th style="padding:10px 8px;">Is active</th>
                         <th style="padding:10px 8px;">Is manager</th>
-                        <th style="padding:10px 8px;">Actions</th>
+                        <th style="padding:12px 20px; text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -77,7 +77,7 @@
                             <td style="padding:12px 8px;">{{ user.is_active }}</td>
                             <td style="padding:12px 8px;color:#D10024;font-weight:700;">{{ user.is_manager }}</td>
                             <td style="padding:12px 8px;text-align:right;">
-                                <a href="#"
+                                <a href="{% url "management-users-update" user.pk %}"
                                    class="primary-btn"
                                    style="padding:6px 12px;
                                           border-radius:20px;
