@@ -47,6 +47,7 @@ Table OF Contents
 12 > RESPONSIVE
 14 > FILTERING
 15 > LOGIN
+16 > ERRORS
 ------------------------------------*/
 
 /*=========================================================
@@ -831,7 +832,6 @@ textarea.input {
   padding: 60px 0px;
   margin: 30px 0px;
   background-color: #E4E7ED;
-  background-image: url('../img/hotdeal.png');
   background-position: center;
   background-repeat: no-repeat;
 }
@@ -2401,3 +2401,31 @@ textarea.input {
                 padding: 20px;
             }
         }
+
+/*=========================================================
+	16 -> ERRORS
+===========================================================*/
+
+.page--error {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.error {
+  text-align: center;
+}
+
+.error__code {
+  font-size: clamp(4rem, 10vw, 8rem);
+  margin-bottom: 0.5rem;
+}
+
+.error__title {
+  margin-bottom: 1rem;
+}
+
+.error__message {
+  max-width: 480px;
+  margin: 0 auto 2rem;
+}

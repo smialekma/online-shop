@@ -25,6 +25,6 @@ if settings.DEBUG:
     urlpatterns += debug_toolbar_urls()
     urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
 
-# handler404 = 'my_app.views.error_404'
-# handler500 = 'my_app.views.error_500'
-# handler403 = 'my_app.views.error_403'
+handler404 = "dashboard.views.errors.handler404"
+handler500 = "dashboard.views.errors.handler500"
+handler403 = "dashboard.views.errors.handler403"
