@@ -280,19 +280,19 @@
                     <h3 class="footer-title">Information</h3>
                     <ul class="footer-links">
                         <li>
-                            <a href="#">About Us</a>
+                            <a href="{% url "about-view" %}">About Us</a>
                         </li>
                         <li>
-                            <a href="#">Contact Us</a>
+                            <a href="{% url "contact-view" %}">Contact Us</a>
                         </li>
                         <li>
-                            <a href="#">Privacy Policy</a>
+                            <a href="{% url "policy-view" %}">Privacy Policy</a>
                         </li>
                         <li>
-                            <a href="#">Orders and Returns</a>
+                            <a href="{% url "returns-view" %}">Orders and Returns</a>
                         </li>
                         <li>
-                            <a href="#">Terms & Conditions</a>
+                            <a href="{% url "terms-view" %}">Terms & Conditions</a>
                         </li>
                     </ul>
                 </div>
@@ -313,7 +313,7 @@
                             </li>
                         {% endif %}
                         <li>
-                            <a href="#">Help</a>
+                            <a href="{% url "help-view" %}">Help</a>
                         </li>
                     </ul>
                 </div>

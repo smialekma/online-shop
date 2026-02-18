@@ -1,3 +1,5 @@
+from typing import Any
+
 import django_filters
 from django.db.models import QuerySet
 
@@ -29,6 +31,7 @@ class OrderFilter(django_filters.FilterSet):
 
     class Meta:
         model = Order
+        fields: list[Any] = []
 
     def filter_by_status(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         value = value.lower()
