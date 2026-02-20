@@ -5,8 +5,22 @@ from factory import LazyAttribute
 
 from customer_addresses.factories import CustomerAddressFactory
 from customers.factories import CustomerFactory
-from orders.models import Order, OrderItem
+from orders.models import Order, OrderItem, ShippingMethod
 from products.factories import ProductFactory
+
+
+class ShippingMethodFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = ShippingMethod
+
+    name = factory.Sequence(lambda n: f"method{n}")
+    price = factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
+    min_delivery_time_in_days = factory.Faker("random_int", min=1, max=5)
+    max_delivery_time_in_days = LazyAttribute(
+        lambda obj: obj.min_delivery_time_in_days
+        + factory.Faker("random_int", min=1, max=3)
+    )
 
 
 class OrderFactory(factory.django.DjangoModelFactory):
@@ -47,6 +61,11 @@ class OrderFactory(factory.django.DjangoModelFactory):
     total_amount = factory.Faker(
         "pydecimal", left_digits=4, right_digits=2, positive=True
     )
+
+    order_notes = factory.Faker("text", max_nb_chars=200)
+
+    email = customer.email
+    shipping_method = factory.SubFactory(ShippingMethodFactory)
 
 
 class OrderItemFactory(factory.django.DjangoModelFactory):

@@ -15,6 +15,7 @@ class CustomerFactory(factory.django.DjangoModelFactory):
     is_active = True
     is_staff = False
     is_superuser = False
+    is_manager = False
 
     password = factory.PostGenerationMethodCall("set_password", "defaultpassword")
     address = factory.SubFactory(CustomerAddressFactory)
