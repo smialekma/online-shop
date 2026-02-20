@@ -27,9 +27,3 @@ class ReviewForm(forms.ModelForm):
                 }
             ),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.fields["rating"].empty_label = None
-        # self.fields["rating"].initial = 5
-        # self.fields["rating"].widget.attrs.update({"class": "input-rating"})

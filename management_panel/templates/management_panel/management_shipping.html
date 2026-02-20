@@ -54,7 +54,7 @@
                         <th style="padding:10px 8px;">Name</th>
                         <th style="padding:10px 8px;">Delivery time</th>
                         <th style="padding:10px 8px;">Price</th>
-                        <th style="padding:10px 8px;">Actions</th>
+                        <th style="padding:12px 20px; text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,7 +65,7 @@
                             <td style="padding:12px 8px;">{{ method.get_delivery_time_for_display }}</td>
                             <td style="padding:12px 8px;color:#D10024;font-weight:700;">{{ method.price }}</td>
                             <td style="padding:12px 8px;text-align:right;">
-                                <a href="#"
+                                <a href="{% url "management-shipping-update" method.pk %}"
                                    class="primary-btn"
                                    style="padding:6px 12px;
                                           border-radius:20px;

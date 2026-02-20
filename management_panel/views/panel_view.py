@@ -1,7 +1,8 @@
 from datetime import timedelta
+from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db.models import Sum
+from django.db.models import Sum, QuerySet
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -12,18 +13,18 @@ from products.models import Product, Brand, Category
 
 
 class ManagementBaseView(LoginRequiredMixin, UserPassesTestMixin):
-    def test_func(self):
+    def test_func(self) -> bool:
         return self.request.user.is_manager or self.request.user.is_superuser
 
 
 class ManagementPanelView(ManagementBaseView, TemplateView):
     template_name = "management_panel/management_panel.html"
 
-    def test_func(self):
+    def test_func(self) -> bool:
         return self.request.user.is_manager or self.request.user.is_superuser
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context: dict[str, Any] = super().get_context_data()
 
         recent_items = self._get_recent_items()
         monthly_statistics = self._get_item_monthly_statistics()
@@ -44,7 +45,7 @@ class ManagementPanelView(ManagementBaseView, TemplateView):
 
         return context
 
-    def _get_recent_items(self):
+    def _get_recent_items(self) -> dict[str, QuerySet]:
         return {
             "recent_reviews": Review.objects.select_related("author").order_by(
                 "-created_at"
@@ -54,7 +55,7 @@ class ManagementPanelView(ManagementBaseView, TemplateView):
             )[:5],
         }
 
-    def _get_item_counts(self):
+    def _get_item_counts(self) -> dict[str, int]:
         return {
             "total_products": Product.objects.count(),
             "brands_count": Brand.objects.count(),
@@ -63,7 +64,7 @@ class ManagementPanelView(ManagementBaseView, TemplateView):
             "pending_payments": Payment.objects.filter(is_paid=False).count(),
         }
 
-    def _get_item_monthly_statistics(self):
+    def _get_item_monthly_statistics(self) -> dict[str, int]:
         today = timezone.now()
         today_minus_30d = today - timedelta(days=30)
 

@@ -71,7 +71,7 @@
                         <th style="padding:10px 8px;">Rating</th>
                         <th style="padding:10px 8px;">Product</th>
                         <th style="padding:10px 8px;">Date</th>
-                        <th style="padding:10px 8px;">Actions</th>
+                        <th style="padding:12px 20px; text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,7 +84,7 @@
                             <td style="padding:12px 8px;color:#D10024;font-weight:700;">{{ review.product.name }}</td>
                             <td style="padding:12px 8px;">{{ review.created_at|date:"d-m-Y" }}</td>
                             <td style="padding:12px 8px;text-align:right;">
-                                <a href="#"
+                                <a href="{% url "management-reviews-update" review.pk %}"
                                    class="primary-btn"
                                    style="padding:6px 12px;
                                           border-radius:20px;

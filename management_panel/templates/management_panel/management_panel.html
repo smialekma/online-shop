@@ -132,7 +132,7 @@
                                 <td style="padding:12px 8px;color:#D10024;font-weight:700;">{{ order.total_amount }}</td>
                                 <td style="padding:12px 8px;">{{ order.created_at }}</td>
                                 <td style="padding:12px 8px;text-align:right;">
-                                    <a href="#"
+                                    <a href="{% url "management-orders-update" order.pk %}"
                                        class="primary-btn"
                                        style="padding:8px 14px;
                                               border-radius:20px;

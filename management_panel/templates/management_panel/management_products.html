@@ -72,7 +72,7 @@
                         <th style="padding:10px 8px;">Price</th>
                         <th style="padding:10px 8px;">Quantity</th>
                         <th style="padding:10px 8px;">On sale</th>
-                        <th style="padding:10px 8px;">Actions</th>
+                        <th style="padding:12px 20px; text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,7 +86,7 @@
                             <td style="padding:12px 8px;">{{ product.quantity }}</td>
                             <td style="padding:12px 8px;">{{ product.is_sale }}</td>
                             <td style="padding:12px 8px;text-align:right;">
-                                <a href="#"
+                                <a href="{% url "management-products-update" product.pk %}"
                                    class="primary-btn"
                                    style="padding:6px 12px;
                                           border-radius:20px;

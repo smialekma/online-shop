@@ -52,7 +52,7 @@
                     <tr style="text-align:left;border-bottom:1px solid #E4E7ED;">
                         <th style="padding:10px 8px;">Id</th>
                         <th style="padding:10px 8px;">Name</th>
-                        <th style="padding:10px 8px;">Actions</th>
+                        <th style="padding:12px 20px; text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,7 +61,7 @@
                             <td style="padding:12px 8px;">{{ category.pk }}</td>
                             <td style="padding:12px 8px;">{{ category.name }}</td>
                             <td style="padding:12px 8px;text-align:right;">
-                                <a href="#"
+                                <a href="{% url "management-categories-update" category.pk %}"
                                    class="primary-btn"
                                    style="padding:6px 12px;
                                           border-radius:20px;

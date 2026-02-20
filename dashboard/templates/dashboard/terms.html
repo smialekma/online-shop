@@ -1,0 +1,69 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block content %}
+    <!-- BREADCRUMB -->
+    <div id="breadcrumb">
+        <div class="container">
+            <h3 class="breadcrumb-header">{{ name }}</h3>
+            <ul class="breadcrumb-tree">
+                <li>
+                    <a href="{% url "home-view" %}">Home</a>
+                </li>
+                <li class="active">{{ name }}</li>
+            </ul>
+        </div>
+    </div>
+    <!-- TERMS SECTION -->
+    <div class="section">
+        <div class="container">
+            <div class="section-title">
+                <h3 class="title">General Terms</h3>
+            </div>
+            <p>
+                This Terms and Conditions page is a placeholder. The content below is provided
+                for demonstration purposes only and does not constitute legal advice.
+            </p>
+            <h4>1. Acceptance of Terms</h4>
+            <p>
+                By accessing or using this website, you agree to be bound by these Terms and
+                Conditions. If you do not agree with any part of these terms, you should not
+                use the website.
+            </p>
+            <h4>2. Use of the Website</h4>
+            <p>
+                You agree to use this website only for lawful purposes and in a way that does
+                not infringe the rights of, restrict, or inhibit anyone else’s use of the site.
+            </p>
+            <h4>3. Products and Services</h4>
+            <p>
+                All product descriptions, pricing, and availability are subject to change
+                without notice. We reserve the right to modify or discontinue any product
+                or service at any time.
+            </p>
+            <h4>4. Intellectual Property</h4>
+            <p>
+                All content on this website, including text, graphics, logos, and images,
+                is the property of the website owner or its licensors and is protected by
+                applicable intellectual property laws.
+            </p>
+            <h4>5. Limitation of Liability</h4>
+            <p>
+                The website is provided “as is” without warranties of any kind. We shall not
+                be liable for any damages arising from the use or inability to use this website.
+            </p>
+            <h4>6. Governing Law</h4>
+            <p>
+                These Terms and Conditions shall be governed by and interpreted in accordance
+                with the laws applicable in your jurisdiction.
+            </p>
+            <h4>7. Changes to These Terms</h4>
+            <p>
+                We reserve the right to update or modify these Terms and Conditions at any time.
+                Continued use of the website constitutes acceptance of the revised terms.
+            </p>
+            <p>
+                <strong>Last updated:</strong> [Insert date]
+            </p>
+        </div>
+    </div>
+{% endblock %}

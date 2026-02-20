@@ -1,8 +1,9 @@
 import random
+from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Sum, Q, Avg
+from django.db.models import Count, F, Sum, Q, Avg, QuerySet
 from django.views.generic import TemplateView
 from django.db.models import Prefetch
 
@@ -21,7 +22,7 @@ from carts.cart import Cart
 #                  })
 
 
-def _get_random_products(number_of_products):
+def _get_random_products(number_of_products: int) -> QuerySet:
     my_ids = Product.objects.values_list("id", flat=True)
     my_ids = list(my_ids)
 
@@ -51,8 +52,8 @@ def _get_random_products(number_of_products):
 class HomeView(TemplateView):
     template_name = "dashboard/home.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context: dict[str, Any] = super().get_context_data(**kwargs)
 
         categories = Category.objects.all().order_by("name")
         context["category_display"] = categories[:3]
@@ -132,8 +133,8 @@ class HomeView(TemplateView):
 class AccountView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/account.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context: dict[str, Any] = super().get_context_data(**kwargs)
 
         orders = Order.objects.all().filter(customer=self.request.user)
         orders_with_order_items = orders.prefetch_related("order_items")
@@ -154,8 +155,8 @@ class AccountView(LoginRequiredMixin, TemplateView):
 class GlobalSearchView(TemplateView):
     template_name = "dashboard/search.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context: dict[str, Any] = super().get_context_data(**kwargs)
         form = SearchForm(self.request.GET)
         context["form"] = form
         context["products"] = []
@@ -168,7 +169,7 @@ class GlobalSearchView(TemplateView):
             )
 
             context["query"] = query
-            paginator = Paginator(products, 5)
+            paginator = Paginator(products, 12)
             page_number = self.request.GET.get("page")
             page_obj = paginator.get_page(page_number)
             context["page_obj"] = page_obj

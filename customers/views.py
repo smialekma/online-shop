@@ -1,8 +1,12 @@
+from typing import Any
+
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
+from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -28,7 +32,7 @@ class RegisterView(SuccessMessageMixin, CreateView):
         "please make sure you've entered the correct email address, and check your spam folder."
     )
 
-    def form_valid(self, form):
+    def form_valid(self, form: CustomerRegisterForm) -> Any:
         customer = form.save(commit=False)
         customer.save()
 
@@ -57,7 +61,9 @@ class CustomLoginView(SuccessMessageMixin, views.LoginView):
 class CustomLogoutView(views.LogoutView):
     success_message = "You have been successfully logged out."
 
-    def post(self, request, *args, **kwargs):
+    def post(
+        self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponseRedirect | TemplateResponse:
         messages.success(request, self.success_message)
 
         return super().post(request, *args, **kwargs)
@@ -82,7 +88,7 @@ class CustomPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmVi
     template_name = "customers/password_reset_confirm.html"
 
 
-def activate(request, uidb64, token):
+def activate(request: HttpRequest, uidb64: str, token: str) -> HttpResponseRedirect:
     try:
         uid = urlsafe_base64_decode(uidb64)
         user = Customer.objects.get(pk=uid)

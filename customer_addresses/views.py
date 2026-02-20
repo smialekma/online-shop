@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -12,7 +14,7 @@ from customer_addresses.models import CustomerAddress
 class AddressFormMixin:
 
     def save_address(self, form: AddressForm) -> CustomerAddress:
-        new_address = form.save(commit=False)
+        new_address: CustomerAddress = form.save(commit=False)
 
         address_dct = {
             "first_name": new_address.first_name,
@@ -24,9 +26,9 @@ class AddressFormMixin:
             "country": new_address.country,
         }
 
-        if self.request.user.is_authenticated:
+        if self.request.user.is_authenticated:  # type: ignore
             new_address = CustomerAddress.objects.update_or_create(
-                defaults=address_dct, customer=self.request.user
+                defaults=address_dct, customer=self.request.user  # type: ignore
             )[0]
 
         else:
@@ -38,8 +40,8 @@ class AddressFormMixin:
 
     def _get_address_or_none(self) -> CustomerAddress | None:
         try:
-            address = (
-                CustomerAddress.objects.filter(customer=self.request.user)
+            address: CustomerAddress | None = (
+                CustomerAddress.objects.filter(customer=self.request.user)  # type: ignore
                 .order_by("-id")
                 .last()
             )
@@ -48,8 +50,8 @@ class AddressFormMixin:
 
         return address
 
-    def _populate_user_data(self, initial):
-        initial["email"] = self.request.user.email
+    def _populate_user_data(self, initial: dict[str, Any]) -> dict[str, Any]:
+        initial["email"] = self.request.user.email  # type: ignore
 
         address = self._get_address_or_none()
 
@@ -58,7 +60,9 @@ class AddressFormMixin:
 
         return initial
 
-    def _populate_address_data(self, initial, address):
+    def _populate_address_data(
+        self, initial: dict[str, Any], address: CustomerAddress
+    ) -> dict[str, Any]:
         address_fields = [
             "first_name",
             "last_name",
@@ -93,7 +97,9 @@ class EditAddressView(
         url = reverse_lazy("account-view")
         return HttpResponseRedirect(url)
 
-    def get_initial(self, *args, **kwargs):
+    def get_initial(
+        self, *args: tuple[Any], **kwargs: dict[str, Any]
+    ) -> dict[str, Any]:
         initial = super().get_initial()
 
         initial = self._populate_user_data(initial)

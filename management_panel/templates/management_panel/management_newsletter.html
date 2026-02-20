@@ -75,7 +75,7 @@
                         <th style="padding:10px 8px;">Is published</th>
                         <th style="padding:10px 8px;">To publish</th>
                         <th style="padding:10px 8px;">Date</th>
-                        <th style="padding:10px 8px;">Actions</th>
+                        <th style="padding:12px 20px; text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,7 +87,7 @@
                             <td style="padding:12px 8px;color:#D10024;font-weight:700;">{{ post.to_publish }}</td>
                             <td style="padding:12px 8px;">{{ post.created_at|date:"d-m-Y" }}</td>
                             <td style="padding:12px 8px;text-align:right;">
-                                <a href="#"
+                                <a href="{% url "management-newsletter-update" post.pk %}"
                                    class="primary-btn"
                                    style="padding:6px 12px;
                                           border-radius:20px;

@@ -9,7 +9,7 @@ disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
 warn_return_any = true
-#ignore_missing_imports = true
+ignore_missing_imports = true
 
 [project]
 name = "online-shop"

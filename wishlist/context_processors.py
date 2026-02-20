@@ -1,7 +1,9 @@
+from django.http import HttpRequest
+
 from .models import WishlistItem
 
 
-def wishlist_items(request):
+def wishlist_items(request: HttpRequest) -> dict[str, list[int | None]]:
     if request.user.is_authenticated:
         items = (
             WishlistItem.objects.filter(customer=request.user)

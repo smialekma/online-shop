@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db.models import Avg
+from django.db.models import Avg, QuerySet
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, View
@@ -14,20 +14,17 @@ class WishlistView(LoginRequiredMixin, ListView):
     model = WishlistItem
     context_object_name = "items"
     ordering = "-date_added"
-    paginate_by = 5
+    paginate_by = 12
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = super().get_queryset()
 
-        if self.request.user.is_authenticated:
-            return (
-                queryset.select_related("product")
-                .prefetch_related("product__reviews")
-                .filter(customer=self.request.user)
-                .annotate(average_rating=Avg("product__reviews__rating"))
-            )
-        else:
-            return []
+        return (
+            queryset.select_related("product")
+            .prefetch_related("product__reviews")
+            .filter(customer=self.request.user)
+            .annotate(average_rating=Avg("product__reviews__rating"))
+        )
 
 
 class AddToWishlistView(LoginRequiredMixin, View):

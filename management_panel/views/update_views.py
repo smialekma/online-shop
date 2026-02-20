@@ -1,3 +1,6 @@
+from typing import Any
+
+from django.db.models import QuerySet
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView
 
@@ -26,15 +29,15 @@ class OrderUpdateView(ManagementBaseView, UpdateView):
     form_class = OrderUpdateForm
     success_url = reverse_lazy("management-orders")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context: dict[str, Any] = super().get_context_data(**kwargs)
         order = self.get_object()
         context["items"] = OrderItem.objects.filter(order=order).select_related(
             "product"
         )
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         queryset = super().get_queryset()
 
         queryset = (

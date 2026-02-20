@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Any
 
 from .env import env
 from django.contrib import messages
@@ -12,7 +13,7 @@ SECRET_KEY = env("SECRET_KEY")
 
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list[Any] = []
 
 
 INSTALLED_APPS = [
@@ -42,6 +43,7 @@ INSTALLED_EXTENSIONS = [
     "management_panel.apps.ManagementPanelConfig",
     "newsletter.apps.NewsletterConfig",
     "wishlist.apps.WishlistConfig",
+    # "django_cleanup.apps.CleanupConfig"
 ]
 
 

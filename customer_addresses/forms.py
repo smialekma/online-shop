@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import forms
 
 from customer_addresses.models import CustomerAddress
@@ -32,7 +34,7 @@ class CheckoutForm(AddressForm):
     )
     agree = forms.BooleanField(
         label=mark_safe(
-            'I agree to the <a href="/terms/" target="_blank">terms and conditions</a>'
+            'I agree to the <a href="{% url "terms-view" %}" target="_blank">terms and conditions</a>'
         ),
         error_messages={"required": "You must accept the terms and conditions"},
         widget=forms.CheckboxInput(attrs={"class": "input-checkbox"}),
@@ -46,7 +48,7 @@ class CheckoutForm(AddressForm):
         label="Shipping method",
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields["shipping_method"].label_from_instance = lambda obj: obj
 
@@ -67,8 +69,8 @@ class CheckoutForm(AddressForm):
             "shipping_method",
         ]
 
-    def clean_agree(self):
-        agree = self.cleaned_data.get("agree")
+    def clean_agree(self) -> bool:
+        agree: bool = self.cleaned_data.get("agree")
 
         if not agree:
             raise forms.ValidationError("You must accept the terms and conditions")

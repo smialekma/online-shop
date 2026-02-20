@@ -1,0 +1,13 @@
+{% load static %}
+{% include "dashboard/login_header.html" %}
+<main class="page page--error">
+    <section class="container error">
+        <h1 class="error__code">{{ code }}</h1>
+        <h2 class="error__title">{{ title }}</h2>
+        <p class="error__message">{{ message }}</p>
+        <div class="error__actions">
+            <a href="{% url "home-view" %}" class="btn btn-primary">Go to homepage</a>
+        </div>
+    </section>
+</main>
+{% include "dashboard/footnote.html" %}

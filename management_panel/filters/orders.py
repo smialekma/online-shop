@@ -1,5 +1,5 @@
 import django_filters
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.forms import DateInput
 
 from orders.models import Order
@@ -33,7 +33,7 @@ class OrderManagementFilter(django_filters.FilterSet):
         model = Order
         fields = ["created_at"]
 
-    def filter_by_status(self, queryset, name, value):
+    def filter_by_status(self, queryset: QuerySet, name: str, value: str) -> QuerySet:
         value = value.lower()
         if value == "paid":
             return queryset.filter(payments__is_paid=True).distinct()
@@ -44,7 +44,9 @@ class OrderManagementFilter(django_filters.FilterSet):
             # return queryset.exclude(payments__is_paid=True).distinct()
         return queryset
 
-    def filter_search(self, queryset, name, value):
+    def filter_search(
+        self, queryset: QuerySet, name: str, value: str
+    ) -> QuerySet:  # TODO
         return queryset.filter(
             Q(id__icontains=value) | Q(customer__username__icontains=value)
         )

@@ -8,7 +8,7 @@ from django.views.generic.list import ListView
 from django.template.loader import render_to_string
 from product_reviews.models import Review
 from .filters import ProductFilter
-from .models import Product, ProductImage
+from .models import Product, ProductImage, Category
 from django.shortcuts import redirect
 from product_reviews.forms import ReviewForm
 from django.core.serializers.json import DjangoJSONEncoder
@@ -28,18 +28,34 @@ class ProductView(ListView):
     # paginate_by = 3
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context_data = super().get_context_data(**kwargs)
+        context_data: dict[str, Any] = super().get_context_data(**kwargs)
 
         f = ProductFilter(
             self.request.GET,
             queryset=Product.objects.all()
             .prefetch_related("reviews")
+            .select_related("category")
             .annotate(average_rating=Avg("reviews__rating")),
         )
 
         context_data["filter"] = f
 
-        paginator = Paginator(f.qs, 3)
+        context_data["current_category"] = None
+        context_data["is_filtered_by_category"] = False
+
+        context_data["product_count"] = f.qs.count()
+
+        if len(self.request.GET.getlist("category")) == 1:
+            context_data["current_category"] = Category.objects.get(
+                id=int(self.request.GET.getlist("category")[0])
+            )
+        if (
+            len(self.request.GET.getlist("category")) > 1
+            or len(self.request.GET.getlist("category")) == 1
+        ):
+            context_data["is_filtered_by_category"] = True
+
+        paginator = Paginator(f.qs, 12)
         page_number = self.request.GET.get("page", 1)
         page_obj = paginator.get_page(page_number)
         context_data["page_obj"] = page_obj
@@ -73,7 +89,7 @@ class ProductDetailView(CreateView, DetailView):
     def get_context_data(
         self, *, object_list: Optional[QuerySet[Product]] = None, **kwargs: Any
     ) -> dict[str, Any]:
-        context_data = super().get_context_data(**kwargs)
+        context_data: dict[str, Any] = super().get_context_data(**kwargs)
 
         product = self.get_object()
         context_data["product"] = product
@@ -83,7 +99,7 @@ class ProductDetailView(CreateView, DetailView):
             .order_by("-created_at")
         )
 
-        paginator = Paginator(reviews, 3)
+        paginator = Paginator(reviews, 10)
         page_number = self.request.GET.get("page", 1)
         page_obj = paginator.get_page(page_number)
         context_data["page_obj"] = page_obj
@@ -94,9 +110,8 @@ class ProductDetailView(CreateView, DetailView):
         )
         context_data["review_aggregations"] = review_aggregations
         context_data["reviews"] = page_obj
-        context_data["rating_options"] = (1, 2, 3, 4, 5)
 
-        context_data["related_products"] = product.get_related_products(limit=5)
+        context_data["related_products"] = product.get_related_products(limit=4)
         context_data["form"] = ReviewForm()
         return context_data
 
@@ -118,6 +133,20 @@ def add_to_cart(request: HttpRequest) -> JsonResponse:
         product = get_object_or_404(Product, id=product_id)
 
         cart = Cart(request)
+
+        requested_qty = 1
+        available_qty = _get_available_amount_of_product(cart, product, requested_qty)
+
+        # stock limit
+        if available_qty <= 0:
+            return JsonResponse(
+                {
+                    "limited": True,
+                    "quantity": 0,
+                    "message": "Not enough stock available",
+                }
+            )
+
         cart.upsert(product)
 
         cart_html = render_to_string(
@@ -139,7 +168,7 @@ def add_to_cart(request: HttpRequest) -> JsonResponse:
 
 
 @require_POST
-def add_to_cart_with_qty(request, pk):
+def add_to_cart_with_qty(request: HttpRequest, pk: int) -> HttpResponseRedirect:
     product_id = pk
     quantity = int(request.POST.get("quantity", 1))
 
@@ -147,11 +176,7 @@ def add_to_cart_with_qty(request, pk):
 
     cart = Cart(request)
 
-    qty_in_cart = 0
-    if cart.get_item(product_id) is not None:
-        qty_in_cart = cart.get_item(product_id).get("quantity")
-
-    available_quantity = product.quantity - qty_in_cart
+    available_quantity = _get_available_amount_of_product(cart, product, quantity)
 
     if available_quantity <= 0:
         messages.warning(request, "Product out of stock!")
@@ -163,9 +188,33 @@ def add_to_cart_with_qty(request, pk):
         )
     else:
         cart.upsert(product, quantity, False)
-        messages.success(request, "Items added to cart.")
+        messages.success(request, "Item(s) added to cart.")
 
+    for c in cart:
+        print(c)
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+def _get_available_amount_of_product(
+    cart: Cart, product: Product, requested_qty: int, return_cart_qty: bool = False
+) -> int:
+    qty_in_cart: int = 0
+    if cart.get_item(product.id) is not None:
+        item = cart.get_item(product.id)
+        qty_in_cart_temp = item.get("quantity") if item is not None else 0
+        if qty_in_cart_temp is not None:
+            qty_in_cart = qty_in_cart_temp
+
+    qty_available_for_cart_upsert = product.quantity - qty_in_cart
+
+    if qty_available_for_cart_upsert < requested_qty:
+        return (
+            qty_available_for_cart_upsert
+            if not return_cart_qty
+            else qty_available_for_cart_upsert + qty_in_cart
+        )  # TODO
+    else:
+        return requested_qty if not return_cart_qty else requested_qty + qty_in_cart
 
 
 #
