@@ -24,7 +24,7 @@ class ProductView(ListView):
     template_name = "products/products.html"
     # filterset_class = ProductFilter
     # context_object_name = "filter"
-    ordering = ["date_added"]
+    ordering = ["-date_added"]
     # paginate_by = 3
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -232,6 +232,9 @@ def _get_available_amount_of_product(
 def remove_from_cart(request: HttpRequest) -> JsonResponse | HttpResponseRedirect:
     if request.method == "POST":
         product_id = request.POST.get("product_id")
+
+        if product_id is None:
+            raise Exception("No product id in request.")
 
         cart = Cart(request)
         cart.remove(product_id)

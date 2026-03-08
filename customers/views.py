@@ -3,12 +3,11 @@ from typing import Any
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
-from django.http import HttpRequest, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
-from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.generic import CreateView
 from django.contrib import messages
@@ -47,7 +46,7 @@ class RegisterView(SuccessMessageMixin, CreateView):
                 "token": account_activation_token.make_token(customer),
             },
         )
-        to_email = form.cleaned_data.get("email")
+        to_email: str = form.cleaned_data["email"]
         email = EmailMessage(mail_subject, message, to=[to_email])
         email.send()
 
@@ -63,7 +62,7 @@ class CustomLogoutView(views.LogoutView):
 
     def post(
         self, request: HttpRequest, *args: Any, **kwargs: Any
-    ) -> HttpResponseRedirect | TemplateResponse:
+    ) -> HttpResponse | HttpResponse:
         messages.success(request, self.success_message)
 
         return super().post(request, *args, **kwargs)
@@ -90,13 +89,14 @@ class CustomPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmVi
 
 def activate(request: HttpRequest, uidb64: str, token: str) -> HttpResponseRedirect:
     try:
-        uid = urlsafe_base64_decode(uidb64)
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = Customer.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, Customer.DoesNotExist):
         user = None
+
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
-        user.save(updated_fields=["is_active"])
+        user.save(update_fields=["is_active"])
         messages.success(
             request, "Your account has been activated. You may now log in."
         )

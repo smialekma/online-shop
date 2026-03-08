@@ -82,6 +82,9 @@ class RemoveFromCartView(View):
     def post(self, request: HttpRequest) -> HttpResponseRedirect:
         product_id = request.POST.get("product_id")
 
+        if product_id is None:
+            raise Exception("No product id in request.")
+
         cart = Cart(request)
 
         cart.remove(product_id)

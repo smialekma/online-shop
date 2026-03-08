@@ -34,8 +34,6 @@ class AddressFormMixin:
         else:
             new_address = CustomerAddress.objects.create(**address_dct, customer=None)
 
-        self.object = new_address
-
         return new_address
 
     def _get_address_or_none(self) -> CustomerAddress | None:

@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 
-def handler404(request, *args: Any, **argv: Any) -> HttpResponse:
+def handler404(request, *args: Any, **argv: Any) -> HttpResponse | HttpResponse:
     context = {
         "code": "404",
         "title": "Page not found",
@@ -20,7 +20,7 @@ def handler403(request, *args: Any, **argv: Any) -> HttpResponse:
         "title": "Access denied",
         "description": "You don’t have permission to access this page.",
     }
-    response = render(request, "dashboard/error.html", context=context, status=404)
+    response = render(request, "dashboard/error.html", context=context, status=403)
     return response
 
 
@@ -30,5 +30,5 @@ def handler500(request, *args: Any, **argv: Any) -> HttpResponse:
         "title": "Server error",
         "description": "An unexpected error occurred on our side. Please try again later.",
     }
-    response = render(request, "dashboard/error.html", context=context, status=404)
+    response = render(request, "dashboard/error.html", context=context, status=500)
     return response

@@ -1,6 +1,7 @@
 from datetime import timezone
 
 import factory.fuzzy
+from factory import LazyAttribute
 
 from .models import Brand, Category, Product, ProductImage
 
@@ -93,13 +94,16 @@ class ProductFactory(factory.django.DjangoModelFactory):
     brand = factory.SubFactory(BrandFactory)
     description = factory.Faker("text", max_nb_chars=200)
     details = factory.Faker("text", max_nb_chars=200)
-    price = factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
+    old_price = factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
+    price = LazyAttribute(
+        lambda obj: obj.old_price
+        + factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
+    )
     quantity = factory.Faker("random_int", min=0, max=1000000)
     category = factory.SubFactory(CategoryFactory)
     date_added = factory.Faker("date_time", tzinfo=timezone.utc)
 
     is_sale = False
-    old_price = factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
 
 
 class ProductImageFactory(factory.django.DjangoModelFactory):

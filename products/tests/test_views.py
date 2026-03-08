@@ -1,8 +1,21 @@
+from django.db.models import QuerySet, Count, Avg
 from django.test import TestCase, tag, override_settings
-from ..factories import ProductFactory
+
+from carts.cart import Cart
+from customers.factories import CustomerFactory
+from product_reviews.factories import ReviewFactory
+from product_reviews.models import Review
+from ..factories import (
+    ProductFactory,
+    BrandFactory,
+    CategoryFactory,
+    ProductImageFactory,
+)
 from django.urls import reverse
 import shutil
 import tempfile
+
+from ..views import _get_available_amount_of_product
 
 TEMP_MEDIA = tempfile.mkdtemp()
 
@@ -11,7 +24,7 @@ TEMP_MEDIA = tempfile.mkdtemp()
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class ProductViewTestCase(TestCase):
     def setUp(self) -> None:
-        ProductFactory.create_batch(10)
+        ProductFactory.create_batch(30)
         # tworzysz usera
         # self.client.login(user)
 
@@ -40,28 +53,66 @@ class ProductViewTestCase(TestCase):
         self.assertTemplateUsed(response, "products/products.html")
         self.assertIn("products", response.context)
         self.assertIn("filter", response.context)
-        self.assertEqual(len(response.context["products"]), 3)
+        self.assertEqual(len(response.context["products"]), 12)
 
     def test_product_view_pagination_first_page(self) -> None:
-        pass
+        response = self.client.get(reverse("product-view"))
+
+        self.assertEqual(len(response.context["products"]), 12)
 
     def test_product_view_pagination_second_page(self) -> None:
-        pass
+        response = self.client.get(reverse("product-view") + "?page=2")
+
+        self.assertEqual(len(response.context["products"]), 12)
 
     def test_product_view_pagination_last_page(self) -> None:
-        pass
+        response = self.client.get(reverse("product-view") + "?page=3")
+
+        self.assertEqual(len(response.context["products"]), 6)
 
     def test_product_view_ordering_by_date_added(self) -> None:
-        pass
+        response = self.client.get(reverse("product-view"))
+        products = response.context["products"]
+
+        self.assertTrue(products[0].date_added > products[1].date_added)
+        self.assertTrue(products[7].date_added > products[20].date_added)
 
     def test_product_view_top_selling_products(self) -> None:
-        pass
+        response = self.client.get(reverse("product-view"))
+        top_selling_products = response.context["top_selling_products"]
+        all_products: QuerySet = response.context["products"]
+
+        self.assertEqual(len(top_selling_products), 3)
+        self.assertEqual(
+            all_products.annotate(count=Count("order_items"))
+            .order_by("-count")
+            .first()
+            .pk,
+            top_selling_products.first().pk,
+        )
 
     def test_product_view_with_filter_parameters(self) -> None:
-        pass
+        brand = BrandFactory.create(name="test_brand", pk=31)
+        category = CategoryFactory.create(name="test_category", pk=31)
+        ProductFactory.create(category=category, brand=brand, price=3959.79, pk=31)
+
+        response = self.client.get(
+            reverse("product-view")
+            + "?category=31&min_price=3000.01&max_price=3999.98&brand=31"
+        )
+        products = response.context["products"]
+
+        self.assertTrue(len(products) == 1)
+        self.assertEqual(products[0].category.pk, 31)
+        self.assertEqual(products[0].brand.pk, 31)
+        self.assertTrue(products[0].price >= 3000.01)
+        self.assertTrue(products[0].price <= 3999.98)
 
     def test_product_view_products_have_avarage_rating_annotation(self) -> None:
-        pass
+        response = self.client.get(reverse("product-view"))
+        products: QuerySet = response.context["products"]
+
+        self.assertEqual(products[0].average_rating, Avg(products[0].reviews.rating))
 
     def test_product_view_invalid_page_numer(self) -> None:
         pass
@@ -97,3 +148,200 @@ class ProductViewTestCase(TestCase):
     #
     #     # Assert
     #     mock_filter_class.assert_called_once()
+
+
+@tag("x")
+@override_settings(MEDIA_ROOT=TEMP_MEDIA)
+class ProductDetailViewTests(TestCase):
+
+    def setUp(self):
+        self.product = ProductFactory(quantity=10)
+        ProductImageFactory(product=self.product, is_main_photo=True)
+
+        self.reviews = ReviewFactory.create_batch(25, product=self.product)
+
+        self.url = reverse("detail-view", args=[self.product.id])
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(TEMP_MEDIA)
+        super().tearDownClass()
+
+    def test_product_detail_renders(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "products/product_details.html")
+
+    def test_reviews_in_context(self):
+        response = self.client.get(self.url)
+
+        self.assertIn("reviews", response.context)
+        self.assertEqual(len(response.context["reviews"]), 25)
+
+    def test_review_creation(self):
+        user = CustomerFactory()
+        self.client.force_login(user)
+
+        response = self.client.post(
+            self.url, {"rating": 5, "body": "Great product", "title": "Great"}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.url)
+
+    def test_reviews_ordered_by_date_created(self):
+        response = self.client.get(self.url)
+        latest_review = (
+            Review.objects.filter(product_id=self.product.id)
+            .order_by("-created_at")
+            .first()
+        )
+
+        tested_reviews = response.context["reviews"]
+        self.assertEqual(tested_reviews.first().pk, latest_review.pk)
+
+    def test_pagination_first_page(self) -> None:
+        response = self.client.get(self.url)
+
+        self.assertEqual(len(response.context["reviews"]), 10)
+
+    def test_pagination_second_page(self) -> None:
+        response = self.client.get(self.url + "?page=2")
+
+        self.assertEqual(len(response.context["reviews"]), 10)
+
+    def test_pagination_last_page(self) -> None:
+        response = self.client.get(self.url + "?page=3")
+
+        self.assertEqual(len(response.context["reviews"]), 5)
+
+    def test_review_aggregations(self):
+        reviews = (
+            Review.objects.filter(product_id=self.product.id)
+            .order_by("-created_at")
+            .aggregate(average_rating=Avg("rating"), review_count=Count("id"))
+        )
+        response = self.client.get(self.url)
+        tested_aggregations = response.context["review_aggregations"]
+
+        self.assertEqual(tested_aggregations["average_rating"], Avg(reviews.rating))
+        self.assertEqual(tested_aggregations["review_count"], reviews.count())
+
+    def test_related_products(self):
+        pass
+
+
+@tag("x")
+@override_settings(MEDIA_ROOT=TEMP_MEDIA)
+class AddToCartTests(TestCase):
+
+    def setUp(self):
+        self.product = ProductFactory(quantity=10, price=10)
+        self.url = reverse("product-add")
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(TEMP_MEDIA)
+        super().tearDownClass()
+
+    def test_add_product_to_cart(self):
+        response = self.client.post(self.url, {"product_id": self.product.id})
+
+        self.assertEqual(response.status_code, 200)
+
+        session = self.client.session
+        cart = Cart(type("Request", (), {"session": session}))
+
+        self.assertEqual(len(cart), 1)
+
+    def test_add_to_cart_out_of_stock(self):
+        product = ProductFactory(quantity=0)
+
+        response = self.client.post(self.url, {"product_id": product.id})
+
+        self.assertTrue(response.json()["limited"])
+
+
+@tag("x")
+@override_settings(MEDIA_ROOT=TEMP_MEDIA)
+class AddToCartWithQtyTests(TestCase):
+
+    def setUp(self):
+        self.product = ProductFactory(quantity=5)
+        self.url = reverse("detail-add", args=[self.product.id])
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(TEMP_MEDIA)
+        super().tearDownClass()
+
+    def test_add_quantity(self):
+        self.client.post(self.url, {"quantity": 2}, HTTP_REFERER="/")
+
+        session = self.client.session
+        cart = Cart(type("Request", (), {"session": session}))
+
+        self.assertEqual(len(cart), 2)
+
+    def test_add_more_than_stock(self):
+        self.client.post(self.url, {"quantity": 10}, HTTP_REFERER="/")
+
+        session = self.client.session
+        cart = Cart(type("Request", (), {"session": session}))
+
+        self.assertEqual(len(cart), 5)
+
+
+@tag("x")
+@override_settings(MEDIA_ROOT=TEMP_MEDIA)
+class RemoveFromCartTests(TestCase):
+
+    def setUp(self):
+        self.product = ProductFactory(quantity=10)
+        self.url = reverse("product-remove")
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(TEMP_MEDIA)
+        super().tearDownClass()
+
+    def test_remove_product(self):
+        session = self.client.session
+        cart = Cart(type("Request", (), {"session": session}))
+        cart.upsert(self.product, 3)
+        session.save()
+
+        self.client.post(self.url, {"product_id": self.product.id})
+
+        session = self.client.session
+        cart = Cart(type("Request", (), {"session": session}))
+
+        self.assertEqual(len(cart), 0)
+
+
+@tag("x")
+@override_settings(MEDIA_ROOT=TEMP_MEDIA)
+class ProductStockLogicTests(TestCase):
+
+    def setUp(self):
+        self.product = ProductFactory(quantity=5)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(TEMP_MEDIA)
+        super().tearDownClass()
+
+    def test_available_quantity(self):
+        cart = {}
+
+        result = _get_available_amount_of_product(cart, self.product, 2)
+
+        self.assertEqual(result, 2)
+
+    def test_quantity_limited_by_stock(self):
+        cart = {}
+
+        result = _get_available_amount_of_product(cart, self.product, 10)
+
+        self.assertEqual(result, 5)
