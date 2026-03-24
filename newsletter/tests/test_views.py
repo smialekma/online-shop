@@ -13,7 +13,7 @@ from newsletter.tokens import newsletter_activation_token
 class SubscribeNewsletterTests(TestCase):
 
     def setUp(self):
-        self.url = reverse("newsletter-subscribe")
+        self.url = reverse("subscribe-newsletter")
 
     def test_subscribe_valid_email(self):
         response = self.client.post(
@@ -81,12 +81,12 @@ class ConfirmSubscriptionTests(TestCase):
         token = newsletter_activation_token.make_token(self.subscriber)
 
         self.valid_url = reverse(
-            "newsletter-confirm",
+            "confirm-subscription-view",
             kwargs={"uidb64": uid, "token": token},
         )
 
         self.invalid_url = reverse(
-            "newsletter-confirm",
+            "confirm-subscription-view",
             kwargs={"uidb64": uid, "token": "invalid-token"},
         )
 

@@ -4,6 +4,7 @@ from django.test import TestCase, tag, override_settings
 from django.urls import reverse
 
 from customers.factories import CustomerFactory
+from dashboard.tests.test_dashboard_views import BaseTestClass
 from management_panel.tests.test_panel_view import ManagementPanelAccessTests
 
 # TODO
@@ -18,18 +19,11 @@ import tempfile
 TEMP_MEDIA = tempfile.mkdtemp()
 
 
-@tag("x")
-@override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class ManagementViewsBaseTest(TestCase, ManagementPanelAccessTests):
+class ManagementViewsBaseTest(BaseTestClass):
 
     def setUp(self):
         self.admin = CustomerFactory(is_manager=True)
         self.client.force_login(self.admin)
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
-        super().tearDownClass()
 
 
 class OrderManagementListViewTests(ManagementViewsBaseTest):
@@ -52,7 +46,7 @@ class OrderManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["orders"]), 20)
 
 
 class BrandManagementListViewTests(ManagementViewsBaseTest):
@@ -74,7 +68,7 @@ class BrandManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["brands"]), 20)
 
 
 class CategoryManagementListViewTests(ManagementViewsBaseTest):
@@ -96,7 +90,7 @@ class CategoryManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["categories"]), 20)
 
 
 class ReviewManagementListViewTests(ManagementViewsBaseTest):
@@ -118,7 +112,7 @@ class ReviewManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["reviews"]), 20)
 
 
 class PaymentManagementListViewTests(ManagementViewsBaseTest):
@@ -140,7 +134,7 @@ class PaymentManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["payments"]), 20)
 
 
 class ProductManagementListViewTests(ManagementViewsBaseTest):
@@ -184,7 +178,7 @@ class ShippingMethodManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["methods"]), 20)
 
 
 class UserManagementListViewTests(ManagementViewsBaseTest):
@@ -206,7 +200,7 @@ class UserManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["users"]), 20)
 
 
 class SubscriberManagementListViewTests(ManagementViewsBaseTest):
@@ -228,7 +222,7 @@ class SubscriberManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["subscribers"]), 20)
 
 
 class NewsletterManagementListViewTests(ManagementViewsBaseTest):
@@ -250,4 +244,4 @@ class NewsletterManagementListViewTests(ManagementViewsBaseTest):
 
         response = self.client.get(self.url)
 
-        self.assertEqual(len(response.context["products"]), 20)
+        self.assertEqual(len(response.context["posts"]), 20)

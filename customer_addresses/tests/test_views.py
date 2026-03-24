@@ -17,7 +17,7 @@ class EditAddressViewTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertIn(reverse_lazy("login-view"), response.url)
+        self.assertIn(response.url, reverse_lazy("login-view") + "?next=" + reverse_lazy("edit-address-view"))
 
     def test_get_form_for_logged_user(self):
         self.client.force_login(self.user)
@@ -31,6 +31,7 @@ class EditAddressViewTests(TestCase):
         self.client.force_login(self.user)
 
         data = {
+            "email": self.user.email,
             "first_name": "John",
             "last_name": "Doe",
             "address_line": "Test Street 1",
@@ -47,7 +48,7 @@ class EditAddressViewTests(TestCase):
 
         self.assertTrue(
             CustomerAddress.objects.filter(
-                user=self.user, street="Test Street 1"
+                customer=self.user, address_line="Test Street 1"
             ).exists()
         )
 
@@ -55,6 +56,7 @@ class EditAddressViewTests(TestCase):
         self.client.force_login(self.user)
 
         data = {
+            "email": self.user.email,
             "first_name": "John",
             "last_name": "Doe",
             "address_line": "Test Street 1",
@@ -69,7 +71,7 @@ class EditAddressViewTests(TestCase):
         messages = list(get_messages(response.wsgi_request))
 
         self.assertTrue(
-            any("successfully saved" in str(message) for message in messages)
+            any("successfully saved" in str(message.message) for message in messages)
         )
 
     def test_initial_data_contains_user_data(self):

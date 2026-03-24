@@ -1,4 +1,5 @@
 from datetime import timezone
+from decimal import Decimal
 
 import factory.fuzzy
 from factory import LazyAttribute
@@ -80,8 +81,8 @@ class CategoryFactory(factory.django.DjangoModelFactory):
         color=factory.fuzzy.FuzzyChoice(
             ["blue", "yellow", "green", "orange", "red", "purple"]
         ),
-        height=400,
-        width=600,
+        height=1,
+        width=1,
     )
 
 
@@ -97,7 +98,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
     old_price = factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
     price = LazyAttribute(
         lambda obj: obj.old_price
-        + factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
+        + Decimal("5.00")
     )
     quantity = factory.Faker("random_int", min=0, max=1000000)
     category = factory.SubFactory(CategoryFactory)
@@ -115,8 +116,8 @@ class ProductImageFactory(factory.django.DjangoModelFactory):
         color=factory.fuzzy.FuzzyChoice(
             ["blue", "yellow", "green", "orange", "red", "purple"]
         ),
-        height=600,
-        width=600,
+        height=1,
+        width=1,
     )
     is_main_photo = False
     product = factory.SubFactory(ProductFactory)

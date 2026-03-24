@@ -3,6 +3,7 @@ from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 
 from customers.factories import CustomerFactory
+from dashboard.tests.test_dashboard_views import BaseTestClass
 from products.factories import ProductFactory
 from wishlist.factories import WishlistItemFactory
 import tempfile
@@ -14,8 +15,7 @@ TEMP_MEDIA = tempfile.mkdtemp()
 
 
 @tag("x")
-@override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class WishlistViewTests(TestCase):
+class WishlistViewTests(BaseTestClass):
 
     def setUp(self):
         self.user = CustomerFactory()
@@ -27,11 +27,6 @@ class WishlistViewTests(TestCase):
         WishlistItemFactory(customer=self.other_user, product=self.product)
 
         self.url = reverse("wishlist-view")
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
-        super().tearDownClass()
 
     def test_login_required(self):
         response = self.client.get(self.url)
@@ -48,10 +43,7 @@ class WishlistViewTests(TestCase):
         self.assertEqual(len(items), 1)
         self.assertEqual(items[0].customer, self.user)
 
-
-@tag("x")
-@override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class AddToWishlistTests(TestCase):
+class AddToWishlistTests(BaseTestClass):
 
     def setUp(self):
         self.user = CustomerFactory()
@@ -60,11 +52,6 @@ class AddToWishlistTests(TestCase):
         self.url = reverse("wishlist-add")
 
         self.client.force_login(self.user)
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
-        super().tearDownClass()
 
     def test_add_product_to_wishlist(self):
         self.client.post(self.url, {"product_id": self.product.id}, HTTP_REFERER="/")
@@ -94,9 +81,7 @@ class AddToWishlistTests(TestCase):
         self.assertTrue(any("added to wishlist" in str(m) for m in messages))
 
 
-@tag("x")
-@override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class RemoveFromWishlistTests(TestCase):
+class RemoveFromWishlistTests(BaseTestClass):
 
     def setUp(self):
         self.user = CustomerFactory()
@@ -107,11 +92,6 @@ class RemoveFromWishlistTests(TestCase):
         self.url = reverse("wishlist-remove")
 
         self.client.force_login(self.user)
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
-        super().tearDownClass()
 
     def test_remove_product(self):
         self.client.post(self.url, {"product_id": self.product.id}, HTTP_REFERER="/")

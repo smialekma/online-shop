@@ -1,4 +1,4 @@
-from unittest import TestCase
+from django.test import TestCase
 
 from customer_addresses.factories import CustomerAddressFactory
 from customer_addresses.models import CustomerAddress
@@ -10,8 +10,8 @@ class TestCustomerAddressFactory(TestCase):
 
         address = CustomerAddress.objects.get(pk=obj.pk)
         self.assertEqual(CustomerAddress.objects.count(), 1)
-        self.assertIsNotNone(address.name)
+        self.assertIsNotNone(address.address_line)
 
     def test_multiple_object_created(self) -> None:
-        CustomerAddressFactory.create(batch=5)
+        CustomerAddressFactory.create_batch(5)
         self.assertEqual(CustomerAddress.objects.count(), 5)

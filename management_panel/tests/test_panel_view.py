@@ -6,33 +6,29 @@ from django.utils import timezone
 
 from customers.factories import CustomerFactory
 from dashboard.management.commands.populate_db import Command
+from dashboard.tests.test_dashboard_views import BaseTestClass
 from orders.factories import ShippingMethodFactory, OrderFactory
 from payments.factories import PaymentFactory
 from product_reviews.factories import ReviewFactory
 import tempfile
-import shutil
 
 
 TEMP_MEDIA = tempfile.mkdtemp()
 
 
-@tag("x")
-@override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class ManagementPanelBaseTests(TestCase):
-
-    def setUp(self):
-        self.url = reverse("management-panel")
-        self.manager = CustomerFactory(is_manager=True)
+class ManagementPanelBaseTests(BaseTestClass):
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
-        super().tearDownClass()
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.url = reverse("management-view")
+        cls.manager = CustomerFactory(is_manager=True)
 
 
 class ManagementPanelAccessTests(ManagementPanelBaseTests):
 
     def test_login_required(self):
+        self.client.logout()
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 302)
@@ -67,10 +63,8 @@ class ManagementPanelContextTests(ManagementPanelBaseTests):
         categories = command.create_categories(4)
         command.create_products(3, brands=brands, categories=categories)
 
-        ShippingMethodFactory.create_batch(2)
-
-        PaymentFactory(is_paid=False)
-        PaymentFactory(is_paid=True)
+        PaymentFactory(is_paid=False, order=OrderFactory())
+        PaymentFactory(is_paid=True, order=OrderFactory())
 
         response = self.client.get(self.url)
 
@@ -92,19 +86,21 @@ class ManagementPanelContextTests(ManagementPanelBaseTests):
     def test_monthly_statistics(self):
         now = timezone.now()
 
-        OrderFactory(created_at=now - timedelta(days=10))
-        OrderFactory(created_at=now - timedelta(days=40))
+        o1 = OrderFactory(created_at=now - timedelta(days=10))
+        o2 = OrderFactory(created_at=now - timedelta(days=40))
 
         PaymentFactory(
             is_paid=True,
             amount=100,
             created_at=now - timedelta(days=5),
+            order=o1
         )
 
         PaymentFactory(
             is_paid=True,
             amount=50,
             created_at=now - timedelta(days=40),
+            order=o2
         )
 
         response = self.client.get(self.url)

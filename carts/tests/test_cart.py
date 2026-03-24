@@ -8,15 +8,13 @@ import shutil
 
 TEMP_MEDIA = tempfile.mkdtemp()
 
-
-@tag("x")
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class CartTests(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
         self.request = self.factory.get("/")
-        self.request.session = {}
+        self.request.session = self.client.session
 
         self.product = ProductFactory(price=10, quantity=10)
         ProductImageFactory(product=self.product, is_main_photo=True)

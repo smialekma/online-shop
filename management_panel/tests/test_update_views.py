@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from customer_addresses.factories import CustomerAddressFactory
 from customers.factories import CustomerFactory
+from dashboard.tests.test_dashboard_views import BaseTestClass
 from management_panel.tests.test_panel_view import ManagementPanelAccessTests
 import tempfile
 import shutil
@@ -16,18 +17,11 @@ from products.factories import ProductFactory, BrandFactory, CategoryFactory
 TEMP_MEDIA = tempfile.mkdtemp()
 
 
-@tag("x")
-@override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class ManagementUpdateViewBase(TestCase, ManagementPanelAccessTests):
+class ManagementUpdateViewBase(ManagementPanelAccessTests):
 
     def setUp(self):
         self.manager = CustomerFactory(is_manager=True)
         self.client.force_login(self.manager)
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
-        super().tearDownClass()
 
 
 class OrderUpdateViewTests(ManagementUpdateViewBase):
@@ -114,7 +108,7 @@ class ProductUpdateViewTests(ManagementUpdateViewBase):
     def setUp(self):
         super().setUp()
         self.product = ProductFactory()
-        self.url = reverse("management-product-update", args=[self.product.id])
+        self.url = reverse("management-products-update", args=[self.product.id])
 
     def test_product_update_view(self):
         response = self.client.get(self.url)

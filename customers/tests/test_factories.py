@@ -1,4 +1,4 @@
-from unittest import TestCase
+from django.test import TestCase
 
 from customers.factories import CustomerFactory
 from customers.models import Customer
@@ -10,8 +10,8 @@ class TestCustomerFactory(TestCase):
 
         customer = Customer.objects.get(pk=obj.pk)
         self.assertEqual(Customer.objects.count(), 1)
-        self.assertIsNotNone(customer.name)
+        self.assertIsNotNone(customer.username)
 
     def test_multiple_object_created(self) -> None:
-        CustomerFactory.create(batch=5)
+        CustomerFactory.create_batch(5)
         self.assertEqual(Customer.objects.count(), 5)

@@ -6,7 +6,7 @@ from newsletter.models import Subscriber
 class SubscriberUpdateForm(forms.ModelForm):
     class Meta:
         model = Subscriber
-        fields = "__all__"
+        fields = ["email", "is_active", "date_subscribed"]
         widgets = {
-            "date_subscribed": forms.DateInput(attrs={"type": "datetime-local"}),
+            "date_subscribed": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }

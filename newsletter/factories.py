@@ -10,7 +10,7 @@ class SubscriberFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Subscriber
 
-    email = factory.LazyAttribute(lambda obj: f"{obj.username}@gmail.com")
+    email = factory.Sequence(lambda n: f"subscriber{n}@gmail.com")
 
     is_active = True
     date_subscribed = factory.Faker("date_time", tzinfo=timezone.utc)

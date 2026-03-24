@@ -1,13 +1,13 @@
 from django import forms
 from django.forms import model_to_dict
-from django.test import TestCase
 
+from dashboard.tests.test_dashboard_views import BaseTestClass
 from product_reviews.factories import ReviewFactory
 from product_reviews.forms import ReviewForm
 from product_reviews.models import Review
 
 
-class ReviewFormTests(TestCase):
+class ReviewFormTests(BaseTestClass):
 
     def setUp(self):
         self.review = ReviewFactory()
@@ -23,7 +23,11 @@ class ReviewFormTests(TestCase):
 
         self.assertTrue(form.is_valid())
 
-        obj = form.save()
+        obj = form.save(commit=False)
+
+        obj.product = self.review.product
+        obj.author = self.review.author
+        obj.save()
 
         self.assertEqual(obj.title, self.review.title)
 
@@ -42,7 +46,9 @@ class ReviewFormTests(TestCase):
         field = form.fields["rating"]
 
         self.assertIsInstance(field, forms.ChoiceField)
-        self.assertEqual(field.choices, Review.RATING_CHOICES)
+        for count, choice in enumerate(field.choices):
+            self.assertEqual(choice[0], Review.RATING_CHOICES[count][0])
+            self.assertEqual(choice[1], Review.RATING_CHOICES[count][1])
         self.assertIsInstance(field.widget, forms.RadioSelect)
 
     def test_title_widget(self):

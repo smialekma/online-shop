@@ -1,3 +1,4 @@
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
@@ -17,6 +18,7 @@ class RegisterViewTests(TestCase):
 
     def test_register_creates_customer(self):
         data = {
+            "username": "user123",
             "email": "test@example.com",
             "password1": "StrongPassword123!",
             "password2": "StrongPassword123!",
@@ -29,6 +31,7 @@ class RegisterViewTests(TestCase):
 
     def test_register_sends_activation_email(self):
         data = {
+            "username": "user123",
             "email": "test1@example.com",
             "password1": "StrongPassword123!",
             "password2": "StrongPassword123!",
@@ -41,6 +44,7 @@ class RegisterViewTests(TestCase):
 
     def test_register_redirects_after_success(self):
         data = {
+            "username": "user123",
             "email": "test2@example.com",
             "password1": "StrongPassword123!",
             "password2": "StrongPassword123!",
@@ -55,13 +59,15 @@ class CustomLoginViewTests(TestCase):
 
     def setUp(self):
         self.customer = CustomerFactory.create()
+        self.customer.set_password("testpass123")
+        self.customer.save()
 
         self.url = reverse("login-view")
 
     def test_login_success(self):
         response = self.client.post(
             self.url,
-            {"username": self.customer.email, "password": self.customer.password},
+            {"username": self.customer.email, "password": "testpass123"},
         )
 
         self.assertEqual(response.status_code, 302)
@@ -70,17 +76,13 @@ class CustomLoginViewTests(TestCase):
     def test_success_message_added(self):
         response = self.client.post(
             self.url,
-            {"username": self.customer.email, "password": self.customer.password},
+            {"username": self.customer.email, "password": "testpass123"},
         )
 
-        messages = list(get_messages(response.wsgi_request))
+        messages = [m.message for m in get_messages(response.wsgi_request)]
 
-        self.assertTrue(
-            any(
-                "You have been successfully logged in" in str(message)
-                for message in messages
-            )
-        )
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'You have been successfully logged in.')
 
 
 class CustomLogoutViewTests(TestCase):
@@ -138,7 +140,7 @@ class PasswordResetConfirmViewTests(TestCase):
         self.customer.save()
 
         uid = urlsafe_base64_encode(force_bytes(self.customer.pk))
-        token = account_activation_token.make_token(self.customer)
+        token = default_token_generator.make_token(self.customer)
 
         self.url = reverse(
             "password_reset_confirm",
@@ -146,6 +148,10 @@ class PasswordResetConfirmViewTests(TestCase):
         )
 
     def test_password_reset_confirm(self):
+        # 1. validate token
+        self.client.get(self.url)
+
+        # 2. submit new password
         response = self.client.post(
             self.url,
             {
@@ -166,12 +172,12 @@ class ActivateAccountViewTests(TestCase):
         token = account_activation_token.make_token(self.customer)
 
         self.valid_url = reverse(
-            "activate",
+            "activate-view",
             kwargs={"uidb64": uid, "token": token},
         )
 
         self.invalid_url = reverse(
-            "activate",
+            "activate-view",
             kwargs={"uidb64": uid, "token": "invalid-token"},
         )
 

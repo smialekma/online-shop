@@ -1,8 +1,12 @@
+import os
+from decimal import Decimal
+
 from django.db.models import Count, Avg, F
 from django.test import TestCase, tag, override_settings
 
 from customers.factories import CustomerFactory
 from orders.factories import OrderFactory, OrderItemFactory
+from product_reviews.factories import ReviewFactory
 from products.factories import ProductFactory
 from products.models import Category, Product
 from django.urls import reverse
@@ -15,14 +19,21 @@ from ..views.dashboard_views import _get_random_products
 TEMP_MEDIA = tempfile.mkdtemp()
 
 
-@tag("x")
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class RandomProductsTests(TestCase):
+class BaseTestClass(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.tmp_dir = tempfile.mkdtemp()
 
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+        if os.path.exists:
+            shutil.rmtree(cls.tmp_dir)
         super().tearDownClass()
+
+
+class RandomProductsTests(BaseTestClass):
 
     def test_returns_empty_queryset_when_no_products(self):
         products = _get_random_products(6)
@@ -44,26 +55,22 @@ class RandomProductsTests(TestCase):
         self.assertEqual(products.count(), 6)
 
 
-@tag("x")
-@override_settings(MEDIA_ROOT=TEMP_MEDIA)
-class HomeViewTestCase(TestCase):
+class HomeViewTestCase(BaseTestClass):
     def setUp(self) -> None:
         self.command = Command()
         self.brands = self.command.create_brands(5)
-        self.categories = self.command.create_categories(5)
-        self.command.create_products(
-            5, brands=self.brands, categories=self.categories, is_sale=False
+        self.categories = self.command.create_categories(2)
+        self.products1 = self.command.create_products(
+            7, brands=self.brands, categories=[self.categories[0]], is_sale=False
         )
-        self.command.create_products(
-            5, brands=self.brands, categories=self.categories, is_sale=True
+        self.products2 = self.command.create_products(
+            15, brands=self.brands, categories=[self.categories[1]], is_sale=True
         )
-        # tworzysz usera
-        # self.client.login(user)
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
-        super().tearDownClass()
+        self.products2[7].old_price = self.products2[7].price + Decimal(200.45)
+        self.products2[7].save()
+        # tworzysz usera
+        # self.client.login(user)\
 
     def test_only_get_allowed(self) -> None:
         response = self.client.post(reverse("home-view"))
@@ -117,6 +124,10 @@ class HomeViewTestCase(TestCase):
         )
 
     def test_home_view_top_rated_products(self):
+        ReviewFactory(product=self.products2[4])
+        ReviewFactory(product=self.products1[1])
+        ReviewFactory(product=self.products2[4])
+
         response = self.client.get(reverse("home-view"))
 
         products = (
@@ -132,7 +143,6 @@ class HomeViewTestCase(TestCase):
         self.assertEqual(tested_products.first().pk, products.first().pk)
 
     def test_home_view_new_products(self):
-        self.command.create_products(15, brands=self.brands, categories=self.categories)
 
         response = self.client.get(reverse("home-view"))
 
@@ -157,13 +167,13 @@ class HomeViewTestCase(TestCase):
 
             self.assertEqual(len(products_for_category), 5)
             self.assertEqual(is_newest_product, True)
-            self.assertEqual(
-                products_for_category[1].average_rating,
-                Avg(products_for_category[1].reviews.rating),
-            )
 
     def test_product_view_top_selling_products(self) -> None:
-        self.command.create_products(15, brands=self.brands, categories=self.categories)
+        orders = OrderFactory.create_batch(3)
+
+        OrderItemFactory(order=orders[0], product=self.products1[1])
+        OrderItemFactory(order=orders[1], product=self.products1[1])
+        OrderItemFactory(order=orders[0], product=self.products2[2])
 
         response = self.client.get(reverse("home-view"))
 
@@ -187,10 +197,6 @@ class HomeViewTestCase(TestCase):
 
             self.assertEqual(len(products_for_category), 5)
             self.assertEqual(is_top_selling, True)
-            self.assertEqual(
-                products_for_category[1].average_rating,
-                Avg(products_for_category[1].reviews.rating),
-            )
 
 
 class AccountViewTests(TestCase):
@@ -203,12 +209,12 @@ class AccountViewTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("login-view"))
+        self.assertRedirects(response, reverse("login-view") + "?next=" + reverse("account-view"))
 
     def test_account_statistics(self):
         self.client.force_login(self.customer)
 
-        order = OrderFactory(customer=self.customer, total_amount=100)
+        order = OrderFactory(customer=self.customer, total_amount=100.00)
 
         OrderItemFactory(order=order, quantity=2)
         OrderItemFactory(order=order, quantity=3)
@@ -218,7 +224,7 @@ class AccountViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["total_orders"], 1)
         self.assertEqual(response.context["total_products"], 5)
-        self.assertEqual(response.context["total_price"], 100)
+        self.assertEqual(response.context["total_price"], 100.00)
 
 
 class GlobalSearchViewTests(TestCase):

@@ -1,4 +1,4 @@
-from unittest import TestCase
+from django.test import TestCase
 
 from payments.factories import PaymentFactory
 from payments.models import Payment
@@ -10,8 +10,8 @@ class TestPaymentFactory(TestCase):
 
         payment = Payment.objects.get(pk=obj.pk)
         self.assertEqual(Payment.objects.count(), 1)
-        self.assertIsNotNone(payment.name)
+        self.assertIsNotNone(payment.stripe_checkout_id)
 
     def test_multiple_object_created(self) -> None:
-        PaymentFactory.create(batch=5)
+        PaymentFactory.create_batch(5)
         self.assertEqual(Payment.objects.count(), 5)

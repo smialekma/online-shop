@@ -8,11 +8,12 @@ from carts.cart import Cart
 from products.factories import ProductFactory, ProductImageFactory
 import tempfile
 import shutil
+from unittest.mock import Mock
 
 TEMP_MEDIA = tempfile.mkdtemp()
 
 
-@tag("x")
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class CartViewTests(TestCase):
 
@@ -27,6 +28,7 @@ class CartViewTests(TestCase):
         shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
+
     def test_cart_view_renders(self):
         response = self.client.get(self.url)
 
@@ -34,17 +36,19 @@ class CartViewTests(TestCase):
         self.assertTemplateUsed(response, "carts/cart.html")
 
     def test_cart_products_in_context(self):
-        session = self.client.session
-        cart = Cart(type("Request", (), {"session": session}))
+        request = Mock()
+        request.session = self.client.session
+
+        cart = Cart(request)
         cart.upsert(self.product, quantity=2)
-        session.save()
+        request.session.save()
 
         response = self.client.get(self.url)
 
         self.assertEqual(len(response.context["products"]), 1)
 
 
-@tag("x")
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class CartUpdateTests(TestCase):
 
@@ -59,11 +63,14 @@ class CartUpdateTests(TestCase):
         shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
+    @tag("fail")
     def test_update_cart_quantity(self):
-        session = self.client.session
-        cart = Cart(type("Request", (), {"session": session}))
+        request = Mock()
+        request.session = self.client.session
+
+        cart = Cart(request)
         cart.upsert(self.product, quantity=1)
-        session.save()
+        request.session.save()
 
         response = self.client.post(
             self.url,
@@ -73,18 +80,17 @@ class CartUpdateTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        session = self.client.session
-        cart = Cart(type("Request", (), {"session": session}))
-
-        self.assertEqual(len(cart), 3)
+        self.assertEqual(len(response.context["cart"]), 3)
 
     def test_update_limited_by_stock(self):
         product = ProductFactory(price=10, quantity=2)
 
-        session = self.client.session
-        cart = Cart(type("Request", (), {"session": session}))
+        request = Mock()
+        request.session = self.client.session
+
+        cart = Cart(request)
         cart.upsert(product, quantity=1)
-        session.save()
+        request.session.save()
 
         response = self.client.post(
             self.url,
@@ -104,7 +110,7 @@ class CartUpdateTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@tag("x")
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class RemoveFromCartViewTests(TestCase):
 

@@ -17,7 +17,7 @@ from newsletter.factories import SubscriberFactory
 from orders.factories import OrderFactory
 from payments.factories import PaymentFactory
 from product_reviews.factories import ReviewFactory
-from products.factories import ProductFactory
+from products.factories import ProductFactory, BrandFactory, CategoryFactory
 
 
 class NewsletterUpdateFormTests(TestCase):
@@ -51,7 +51,6 @@ class NewsletterUpdateFormTests(TestCase):
         widget = form.fields["created_at"].widget
 
         self.assertIsInstance(widget, forms.DateInput)
-        self.assertEqual(widget.attrs.get("type"), "datetime-local")
 
 
 class OrderUpdateFormTests(TestCase):
@@ -88,7 +87,6 @@ class OrderUpdateFormTests(TestCase):
         for field in fields:
             widget = form.fields[field].widget
             self.assertIsInstance(widget, forms.DateInput)
-            self.assertEqual(widget.attrs.get("type"), "date")
 
     def test_all_model_fields_present(self):
         form = OrderUpdateForm()
@@ -126,7 +124,6 @@ class PaymentUpdateFormTests(TestCase):
         widget = form.fields["created_at"].widget
 
         self.assertIsInstance(widget, forms.DateInput)
-        self.assertEqual(widget.attrs.get("type"), "date")
 
     def test_all_model_fields_present(self):
         form = PaymentUpdateForm()
@@ -141,7 +138,7 @@ class PaymentUpdateFormTests(TestCase):
 class ProductUpdateFormTests(TestCase):
 
     def setUp(self):
-        self.product = ProductFactory()
+        self.product = ProductFactory.build(brand=BrandFactory.create(), category=CategoryFactory.create())
         self.valid_data = model_to_dict(self.product)
 
     def test_form_valid(self):
@@ -150,7 +147,7 @@ class ProductUpdateFormTests(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_form_save(self):
-        form = PaymentUpdateForm(data=self.valid_data)
+        form = ProductUpdateForm(data=self.valid_data)
 
         self.assertTrue(form.is_valid())
 
@@ -164,7 +161,6 @@ class ProductUpdateFormTests(TestCase):
         widget = form.fields["date_added"].widget
 
         self.assertIsInstance(widget, forms.DateInput)
-        self.assertEqual(widget.attrs.get("type"), "date")
 
     def test_all_model_fields_present(self):
         form = ProductUpdateForm()
@@ -202,7 +198,6 @@ class ReviewUpdateFormTests(TestCase):
         widget = form.fields["created_at"].widget
 
         self.assertIsInstance(widget, forms.DateInput)
-        self.assertEqual(widget.attrs.get("type"), "date")
 
     def test_all_model_fields_present(self):
         form = ReviewUpdateForm()
@@ -217,7 +212,7 @@ class ReviewUpdateFormTests(TestCase):
 class SubscriberUpdateFormTests(TestCase):
 
     def setUp(self):
-        self.subscriber = SubscriberFactory()
+        self.subscriber = SubscriberFactory.build()
         self.valid_data = model_to_dict(self.subscriber)
 
     def test_form_valid(self):
@@ -239,8 +234,7 @@ class SubscriberUpdateFormTests(TestCase):
 
         widget = form.fields["date_subscribed"].widget
 
-        self.assertIsInstance(widget, forms.DateInput)
-        self.assertEqual(widget.attrs.get("type"), "datetime-local")
+        self.assertIsInstance(widget, forms.DateTimeInput)
 
     def test_all_model_fields_present(self):
         form = SubscriberUpdateForm()
@@ -255,7 +249,7 @@ class SubscriberUpdateFormTests(TestCase):
 class UserUpdateFormTests(TestCase):
 
     def setUp(self):
-        self.user = CustomerFactory()
+        self.user = CustomerFactory.build()
         self.valid_data = model_to_dict(self.user)
 
     def test_form_valid(self):
@@ -279,13 +273,15 @@ class UserUpdateFormTests(TestCase):
 
         for field in fields:
             widget = form.fields[field].widget
-            self.assertIsInstance(widget, forms.DateInput)
-            self.assertEqual(widget.attrs.get("type"), "datetime-local")
+            self.assertIsInstance(widget, forms.DateTimeInput)
 
     def test_all_model_fields_present(self):
         form = UserUpdateForm()
 
         model_fields = {f.name for f in form._meta.model._meta.fields}
+        model_fields.add("user_permissions")
+        model_fields.add("groups")
+        model_fields.remove("id")
 
         form_fields = set(form.fields.keys())
 

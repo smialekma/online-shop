@@ -24,7 +24,6 @@ class ProductView(ListView):
     template_name = "products/products.html"
     # filterset_class = ProductFilter
     # context_object_name = "filter"
-    ordering = ["-date_added"]
     # paginate_by = 3
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -35,7 +34,7 @@ class ProductView(ListView):
             queryset=Product.objects.all()
             .prefetch_related("reviews")
             .select_related("category")
-            .annotate(average_rating=Avg("reviews__rating")),
+            .annotate(average_rating=Avg("reviews__rating")).order_by("-date_added"),
         )
 
         context_data["filter"] = f
@@ -190,8 +189,6 @@ def add_to_cart_with_qty(request: HttpRequest, pk: int) -> HttpResponseRedirect:
         cart.upsert(product, quantity, False)
         messages.success(request, "Item(s) added to cart.")
 
-    for c in cart:
-        print(c)
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
 
