@@ -34,7 +34,8 @@ class ProductView(ListView):
             queryset=Product.objects.all()
             .prefetch_related("reviews")
             .select_related("category")
-            .annotate(average_rating=Avg("reviews__rating")).order_by("-date_added"),
+            .annotate(average_rating=Avg("reviews__rating"))
+            .order_by("-date_added"),
         )
 
         context_data["filter"] = f

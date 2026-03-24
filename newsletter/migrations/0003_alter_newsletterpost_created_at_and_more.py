@@ -7,18 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('newsletter', '0002_newsletterpost_created_at'),
+        ("newsletter", "0002_newsletterpost_created_at"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='newsletterpost',
-            name='created_at',
+            model_name="newsletterpost",
+            name="created_at",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AlterField(
-            model_name='subscriber',
-            name='date_subscribed',
+            model_name="subscriber",
+            name="date_subscribed",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
     ]

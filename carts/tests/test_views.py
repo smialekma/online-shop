@@ -13,7 +13,6 @@ from unittest.mock import Mock
 TEMP_MEDIA = tempfile.mkdtemp()
 
 
-
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class CartViewTests(TestCase):
 
@@ -27,7 +26,6 @@ class CartViewTests(TestCase):
     def tearDownClass(cls) -> None:
         shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
-
 
     def test_cart_view_renders(self):
         response = self.client.get(self.url)
@@ -46,7 +44,6 @@ class CartViewTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(len(response.context["products"]), 1)
-
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
@@ -108,7 +105,6 @@ class CartUpdateTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
-
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)

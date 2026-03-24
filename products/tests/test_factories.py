@@ -14,7 +14,7 @@ import os
 TEMP_MEDIA = tempfile.mkdtemp()
 
 
-@tag('fast')
+@tag("fast")
 class TestBrandFactory(TestCase):
     def test_single_object_created(self) -> None:
         obj = BrandFactory.create()
@@ -27,13 +27,15 @@ class TestBrandFactory(TestCase):
         BrandFactory.create_batch(5)
         self.assertEqual(Brand.objects.count(), 5)
 
-@tag('fast')
+
+@tag("fast")
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class TestCategoryFactory(TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
+
     def test_single_object_created(self) -> None:
         obj = CategoryFactory.create()
 
@@ -44,7 +46,9 @@ class TestCategoryFactory(TestCase):
     def test_multiple_object_created(self) -> None:
         CategoryFactory.create_batch(5)
         self.assertEqual(Category.objects.count(), 5)
-@tag('fast')
+
+
+@tag("fast")
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class TestProductFactory(TestCase):
     def test_single_object_created(self) -> None:
@@ -62,7 +66,9 @@ class TestProductFactory(TestCase):
     def tearDownClass(cls) -> None:
         shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
-@tag('fast')
+
+
+@tag("fast")
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class TestProductImageFactory(TestCase):
     @classmethod

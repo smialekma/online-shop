@@ -17,7 +17,10 @@ class EditAddressViewTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertIn(response.url, reverse_lazy("login-view") + "?next=" + reverse_lazy("edit-address-view"))
+        self.assertIn(
+            response.url,
+            reverse_lazy("login-view") + "?next=" + reverse_lazy("edit-address-view"),
+        )
 
     def test_get_form_for_logged_user(self):
         self.client.force_login(self.user)

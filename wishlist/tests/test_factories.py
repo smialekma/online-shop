@@ -1,5 +1,3 @@
-from django.test import TestCase
-
 from dashboard.tests.test_dashboard_views import BaseTestClass
 from wishlist.factories import WishlistItemFactory
 from wishlist.models import WishlistItem

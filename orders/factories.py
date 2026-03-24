@@ -19,7 +19,9 @@ class ShippingMethodFactory(factory.django.DjangoModelFactory):
     min_delivery_time_in_days = factory.Faker("random_int", min=1, max=5)
     max_delivery_time_in_days = LazyAttribute(
         lambda obj: obj.min_delivery_time_in_days
-        + factory.Faker("random_int", min=1, max=3).evaluate(obj, None, extra={"locale": "en_US"})
+        + factory.Faker("random_int", min=1, max=3).evaluate(
+            obj, None, extra={"locale": "en_US"}
+        )
     )
 
 
@@ -42,7 +44,7 @@ class OrderFactory(factory.django.DjangoModelFactory):
     )
     updated_at = LazyAttribute(
         lambda obj: obj.date_ordered
-                    + timedelta(
+        + timedelta(
             minutes=factory.Faker("random_int", min=1, max=1440).evaluate(
                 obj, None, extra={"locale": "en_US"}
             )

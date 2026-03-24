@@ -138,7 +138,9 @@ class PaymentUpdateFormTests(TestCase):
 class ProductUpdateFormTests(TestCase):
 
     def setUp(self):
-        self.product = ProductFactory.build(brand=BrandFactory.create(), category=CategoryFactory.create())
+        self.product = ProductFactory.build(
+            brand=BrandFactory.create(), category=CategoryFactory.create()
+        )
         self.valid_data = model_to_dict(self.product)
 
     def test_form_valid(self):

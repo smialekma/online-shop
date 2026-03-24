@@ -90,17 +90,11 @@ class ManagementPanelContextTests(ManagementPanelBaseTests):
         o2 = OrderFactory(created_at=now - timedelta(days=40))
 
         PaymentFactory(
-            is_paid=True,
-            amount=100,
-            created_at=now - timedelta(days=5),
-            order=o1
+            is_paid=True, amount=100, created_at=now - timedelta(days=5), order=o1
         )
 
         PaymentFactory(
-            is_paid=True,
-            amount=50,
-            created_at=now - timedelta(days=40),
-            order=o2
+            is_paid=True, amount=50, created_at=now - timedelta(days=40), order=o2
         )
 
         response = self.client.get(self.url)

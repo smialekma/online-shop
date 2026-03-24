@@ -8,6 +8,7 @@ import shutil
 
 TEMP_MEDIA = tempfile.mkdtemp()
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class CartTests(TestCase):
 

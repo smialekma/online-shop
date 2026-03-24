@@ -209,7 +209,9 @@ class AccountViewTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("login-view") + "?next=" + reverse("account-view"))
+        self.assertRedirects(
+            response, reverse("login-view") + "?next=" + reverse("account-view")
+        )
 
     def test_account_statistics(self):
         self.client.force_login(self.customer)

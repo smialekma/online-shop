@@ -1,5 +1,5 @@
 from django.contrib.messages import get_messages
-from django.test import TestCase, override_settings, tag
+from django.test import tag
 from django.urls import reverse
 
 from customers.factories import CustomerFactory
@@ -7,7 +7,6 @@ from dashboard.tests.test_dashboard_views import BaseTestClass
 from products.factories import ProductFactory
 from wishlist.factories import WishlistItemFactory
 import tempfile
-import shutil
 
 from wishlist.models import WishlistItem
 
@@ -42,6 +41,7 @@ class WishlistViewTests(BaseTestClass):
 
         self.assertEqual(len(items), 1)
         self.assertEqual(items[0].customer, self.user)
+
 
 class AddToWishlistTests(BaseTestClass):
 

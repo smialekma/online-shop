@@ -57,7 +57,9 @@ class CheckoutViewTests(TestCase):
         ProductImageFactory(product=self.product, is_main_photo=True)
 
         self.shipping = ShippingMethodFactory(price=5)
-        self.order = OrderFactory.build(customer=self.user, shipping_method=self.shipping)
+        self.order = OrderFactory.build(
+            customer=self.user, shipping_method=self.shipping
+        )
         self.valid_data = dict(
             email=self.order.email,
             first_name=self.order.address.first_name,

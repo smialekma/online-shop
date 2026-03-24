@@ -10,8 +10,6 @@ from ..factories import (
     BrandFactory,
     CategoryFactory,
     ProductImageFactory,
-
-
 )
 from product_reviews.factories import ReviewFactory
 from django.urls import reverse
@@ -27,7 +25,9 @@ TEMP_MEDIA = tempfile.mkdtemp()
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class ProductViewTestCase(TestCase):
     def setUp(self) -> None:
-        self.products = sorted(ProductFactory.create_batch(30), key=lambda p: p.date_added, reverse=True)
+        self.products = sorted(
+            ProductFactory.create_batch(30), key=lambda p: p.date_added, reverse=True
+        )
         # tworzysz usera
         # self.client.login(user)
 
@@ -170,8 +170,9 @@ class ProductDetailViewTests(TestCase):
         cls.product = ProductFactory.create(quantity=10)
         ProductImageFactory(product=cls.product, is_main_photo=True)
         customers = CustomerFactory.create_batch(25)
-        cls.reviews = [ReviewFactory(product=cls.product, author=customers[i])
-                       for i in range(25)]
+        cls.reviews = [
+            ReviewFactory(product=cls.product, author=customers[i]) for i in range(25)
+        ]
         cls.url = reverse("detail-view", args=[cls.product.id])
 
     @classmethod
@@ -240,11 +241,16 @@ class ProductDetailViewTests(TestCase):
         response = self.client.get(self.url)
         tested_aggregations = response.context["review_aggregations"]
 
-        self.assertEqual(tested_aggregations["average_rating"], review_aggregations["average_rating"])
-        self.assertEqual(tested_aggregations["review_count"], review_aggregations["review_count"])
+        self.assertEqual(
+            tested_aggregations["average_rating"], review_aggregations["average_rating"]
+        )
+        self.assertEqual(
+            tested_aggregations["review_count"], review_aggregations["review_count"]
+        )
 
     def test_related_products(self):
         pass
+
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class AddToCartTests(TestCase):
@@ -274,6 +280,7 @@ class AddToCartTests(TestCase):
         response = self.client.post(self.url, {"product_id": product.id})
 
         self.assertTrue(response.json()["limited"])
+
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class AddToCartWithQtyTests(TestCase):

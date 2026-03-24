@@ -96,10 +96,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
     description = factory.Faker("text", max_nb_chars=200)
     details = factory.Faker("text", max_nb_chars=200)
     old_price = factory.Faker("pydecimal", left_digits=4, right_digits=2, positive=True)
-    price = LazyAttribute(
-        lambda obj: obj.old_price
-        + Decimal("5.00")
-    )
+    price = LazyAttribute(lambda obj: obj.old_price + Decimal("5.00"))
     quantity = factory.Faker("random_int", min=0, max=1000000)
     category = factory.SubFactory(CategoryFactory)
     date_added = factory.Faker("date_time", tzinfo=timezone.utc)

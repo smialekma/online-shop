@@ -1,7 +1,7 @@
 import tempfile
 from datetime import timedelta
 from decimal import Decimal
-from django.test import TestCase, tag, override_settings
+from django.test import tag, override_settings
 from PIL import Image
 from django.test import TestCase
 from django.utils import timezone
@@ -15,13 +15,15 @@ import os
 
 TEMP_MEDIA = tempfile.mkdtemp()
 
+
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class ProductModelTests(TestCase):
-    @classmethod # TODO change for if path.os.exists:
+    @classmethod  # TODO change for if path.os.exists:
     def tearDownClass(cls) -> None:
         if os.path.exists:
             shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
+
     def setUp(self):
         self.product = ProductFactory.create(
             name="Laptop", price=Decimal("100"), old_price=Decimal("200")
@@ -63,13 +65,15 @@ class ProductModelTests(TestCase):
 
         self.assertIn(product2.id, product_ids)
 
-@tag('y') # TODO tworzy plik w cateogry_pics
+
+@tag("y")  # TODO tworzy plik w cateogry_pics
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class ProductImageModelTests(TestCase):
-    @classmethod # TODO change for if path.os.exists:
+    @classmethod  # TODO change for if path.os.exists:
     def tearDownClass(cls) -> None:
         shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
+
     def setUp(self):
         self.product = ProductFactory.create()
 
@@ -84,5 +88,3 @@ class ProductImageModelTests(TestCase):
         )
 
         self.assertIsNotNone(image.id)
-
-

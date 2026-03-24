@@ -70,7 +70,9 @@ class CheckoutView(AddressFormMixin, CreateView):
         for cart_item in cart:
             OrderItem.objects.create(
                 order=order,
-                product=Product.objects.filter(id=cart_item["product"]["id"]).first(),  # __iter__
+                product=Product.objects.filter(
+                    id=cart_item["product"]["id"]
+                ).first(),  # __iter__
                 quantity=cart_item["quantity"],
             )
         cart.clear()
