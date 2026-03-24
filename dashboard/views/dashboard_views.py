@@ -23,8 +23,8 @@ from carts.cart import Cart
 
 
 def _get_random_products(number_of_products: int) -> QuerySet:
-    my_ids = Product.objects.values_list("id", flat=True)
-    my_ids = list(my_ids)
+    my_ids_obj = Product.objects.values_list("id", flat=True)
+    my_ids = list(my_ids_obj)
 
     available_products = len(my_ids)
     products_to_get = min(number_of_products, available_products)
@@ -97,7 +97,7 @@ class HomeView(TemplateView):
                 Product.objects.all()
                 .filter(category=category.id)
                 .select_related("category")
-                .order_by("date_added")
+                .order_by("-date_added")
                 .prefetch_related("reviews")
                 .annotate(average_rating=Avg("reviews__rating"))
                 .prefetch_related(

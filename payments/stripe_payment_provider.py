@@ -1,13 +1,12 @@
 from typing import cast
-
 import stripe
 from django.http import HttpResponse, HttpRequest
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
-from stripe.checkout import Session
 from django.core.mail import EmailMessage
 from django.db import transaction
 from django.db.models import F
+from stripe.checkout import Session
 from stripe.params.checkout import (
     SessionCreateParamsShippingOption,
     SessionCreateParamsLineItem,
@@ -165,7 +164,8 @@ class StripePaymentProvider:
         # create new payment object
         self._create_new_payment(session)
 
-        return session.url
+        url: str | None = session.url
+        return url
 
     def handle_webhook(self) -> HttpResponse:
         payload = self.request.body
@@ -174,7 +174,7 @@ class StripePaymentProvider:
 
         try:
             event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
-        except stripe.SignatureVerificationError:
+        except stripe.error.SignatureVerificationError:
             return HttpResponse(status=400)
 
         # Handle the event

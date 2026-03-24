@@ -1,63 +1,35 @@
-from typing import Any
-
 from django.views.generic import TemplateView
 
 
-class TermsAndConditionsView(TemplateView):
+class StaticPageView(TemplateView):
     template_name = "dashboard/terms.html"
+    page_name = ""
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["name"] = "Terms & Conditions"
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["name"] = self.page_name
         return context
 
 
-class AboutUsView(TemplateView):
-    template_name = "dashboard/terms.html"
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["name"] = "About Us"
-
-        return context
+class TermsAndConditionsView(StaticPageView):
+    page_name = "Terms & Conditions"
 
 
-class ContactUsView(TemplateView):
-    template_name = "dashboard/terms.html"
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["name"] = "Contact Us"
-
-        return context
+class AboutUsView(StaticPageView):
+    page_name = "About Us"
 
 
-class PrivacyPolicyView(TemplateView):
-    template_name = "dashboard/terms.html"
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["name"] = "Privacy Policy"
-
-        return context
+class ContactUsView(StaticPageView):
+    page_name = "Contact Us"
 
 
-class OrdersAndReturnsView(TemplateView):
-    template_name = "dashboard/terms.html"
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["name"] = "Orders & Returns"
-
-        return context
+class PrivacyPolicyView(StaticPageView):
+    page_name = "Privacy Policy"
 
 
-class HelpView(TemplateView):
-    template_name = "dashboard/terms.html"
+class OrdersAndReturnsView(StaticPageView):
+    page_name = "Orders & Returns"
 
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["name"] = "Help"
 
-        return context
+class HelpView(StaticPageView):
+    page_name = "Help"

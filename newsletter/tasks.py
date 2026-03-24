@@ -14,10 +14,11 @@ def send_newsletter() -> None:
         .first()
     )
 
-    mail_subject = post_to_send.title
-    message = post_to_send.body
+    if post_to_send is not None:
+        mail_subject = post_to_send.title
+        message = post_to_send.body
 
-    for subscriber in active_subscribers:
-        to_email = subscriber.email
-        email = EmailMessage(mail_subject, message, to=[to_email])
-        email.send()
+        for subscriber in active_subscribers:
+            to_email = subscriber.email
+            email = EmailMessage(mail_subject, message, to=[to_email])
+            email.send()

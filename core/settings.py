@@ -197,3 +197,9 @@ CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://redis:6379
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
+
+
+import sys
+
+if "test" in sys.argv:
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]

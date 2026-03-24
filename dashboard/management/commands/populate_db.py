@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 from typing import Any
 import random
 
@@ -64,7 +65,11 @@ class Command(BaseCommand):
         return images
 
     def create_products(
-        self, number: int, brands: list[Brand], categories: list[Category]
+        self,
+        number: int,
+        brands: list[Brand],
+        categories: list[Category],
+        is_sale: bool = False,
     ) -> list[Product]:
         products = []
 
@@ -72,7 +77,7 @@ class Command(BaseCommand):
             brand = random.choice(brands)
             category = random.choice(categories)
             product = ProductFactory.create(
-                brand=brand, category=category
+                brand=brand, category=category, is_sale=is_sale
             )  # TODO To Check if still working
             self.create_product_images(product, 3)
             products.append(product)

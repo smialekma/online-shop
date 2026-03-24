@@ -1,10 +1,11 @@
 from decimal import Decimal
-from typing import Optional, Any, Coroutine
+from typing import Optional, Any
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import QuerySet
+from django.forms import model_to_dict
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView
@@ -17,10 +18,14 @@ from customer_addresses.views import AddressFormMixin
 from customers.views import CustomLoginView
 from orders.filters import OrderFilter
 from orders.models import Order, OrderItem, ShippingMethod
-from django.http import HttpResponseRedirect, HttpResponseNotAllowed
+from django.http import (
+    HttpResponseRedirect,
+    HttpResponseBase,
+    HttpRequest,
+)
 
 from payments.models import Payment
-from products.models import ProductImage
+from products.models import ProductImage, Product
 
 
 class CheckoutLoginView(CustomLoginView):
@@ -65,7 +70,9 @@ class CheckoutView(AddressFormMixin, CreateView):
         for cart_item in cart:
             OrderItem.objects.create(
                 order=order,
-                product=cart_item["product"],  # __iter__
+                product=Product.objects.filter(
+                    id=cart_item["product"]["id"]
+                ).first(),  # __iter__
                 quantity=cart_item["quantity"],
             )
         cart.clear()
@@ -74,8 +81,8 @@ class CheckoutView(AddressFormMixin, CreateView):
     def form_valid(self, form: CheckoutForm) -> HttpResponseRedirect:
         new_address = self.save_address(form)
 
-        shipping_method = form.cleaned_data.get("shipping_method")
-        email = form.cleaned_data.get("email")
+        shipping_method: ShippingMethod = form.cleaned_data["shipping_method"]
+        email: str = form.cleaned_data["email"]
         order_notes = form.cleaned_data.get("order_notes")
 
         order = self.create_order(
@@ -101,12 +108,8 @@ class CheckoutView(AddressFormMixin, CreateView):
         return initial
 
     def dispatch(
-        self, *args: tuple[Any], **kwargs: dict[str, Any]
-    ) -> (
-        HttpResponseRedirect
-        | Coroutine[Any, Any, HttpResponseNotAllowed]
-        | HttpResponseNotAllowed
-    ):
+        self, request: HttpRequest | HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponseBase | HttpResponseBase:
         cart = Cart(self.request)
         if not cart:
             messages.error(self.request, "Your cart is empty.")

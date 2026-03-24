@@ -19,8 +19,8 @@ jobs:
         image: postgres:17.5
         env:
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          POSTGRES_DB: ${{ env.DB_NAME }}
-          POSTGRES_USER: ${{ env.DB_USER }}
+          POSTGRES_DB: ${{ vars.DB_NAME }}
+          POSTGRES_USER: ${{ vars.DB_USER }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -61,6 +61,14 @@ jobs:
           poetry run coverage report -m
           poetry run coverage xml
           poetry run coverage html
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ vars.DB_NAME }}
+          DB_USER: ${{ vars.DB_USER }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
 
       - name: Test summary
         if: always()
