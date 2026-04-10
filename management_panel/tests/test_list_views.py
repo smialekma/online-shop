@@ -1,11 +1,7 @@
-import shutil
-
-from django.test import TestCase, tag, override_settings
 from django.urls import reverse
 
 from customers.factories import CustomerFactory
 from dashboard.tests.test_dashboard_views import BaseTestClass
-from management_panel.tests.test_panel_view import ManagementPanelAccessTests
 
 # TODO
 

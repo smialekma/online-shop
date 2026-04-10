@@ -1,12 +1,9 @@
-from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 
 from customer_addresses.factories import CustomerAddressFactory
 from customers.factories import CustomerFactory
-from dashboard.tests.test_dashboard_views import BaseTestClass
 from management_panel.tests.test_panel_view import ManagementPanelAccessTests
 import tempfile
-import shutil
 
 from newsletter.factories import SubscriberFactory, NewsletterPostFactory
 from orders.factories import OrderFactory, OrderItemFactory, ShippingMethodFactory

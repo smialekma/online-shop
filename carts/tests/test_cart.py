@@ -1,4 +1,4 @@
-from django.test import RequestFactory, TestCase, tag, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 
 from carts.cart import Cart
 from core import settings

@@ -1,13 +1,12 @@
 from datetime import timedelta
 
-from django.test import TestCase, override_settings, tag
 from django.urls import reverse
 from django.utils import timezone
 
 from customers.factories import CustomerFactory
 from dashboard.management.commands.populate_db import Command
 from dashboard.tests.test_dashboard_views import BaseTestClass
-from orders.factories import ShippingMethodFactory, OrderFactory
+from orders.factories import OrderFactory
 from payments.factories import PaymentFactory
 from product_reviews.factories import ReviewFactory
 import tempfile

@@ -1,6 +1,5 @@
 from unittest.mock import Mock
 
-from django.forms import model_to_dict
 from django.test import TestCase, tag, override_settings
 from django.urls import reverse
 
@@ -107,9 +106,9 @@ class CheckoutViewTests(TestCase):
     def test_order_items_created_from_cart(self):
         self.add_product_to_cart()
 
-        response = self.client.post(self.url, self.valid_data)
+        self.client.post(self.url, self.valid_data)
 
-        form = CheckoutForm(data=self.valid_data)
+        CheckoutForm(data=self.valid_data)
 
         order = Order.objects.prefetch_related("order_items").first()
 

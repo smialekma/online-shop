@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import QuerySet
-from django.forms import model_to_dict
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, DetailView

@@ -4,7 +4,6 @@ import factory
 from factory import LazyAttribute
 
 from customer_addresses.factories import CustomerAddressFactory
-from customers.factories import CustomerFactory
 from orders.models import Order, OrderItem, ShippingMethod
 from products.factories import ProductFactory
 

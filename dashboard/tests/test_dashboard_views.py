@@ -1,8 +1,8 @@
 import os
 from decimal import Decimal
 
-from django.db.models import Count, Avg, F
-from django.test import TestCase, tag, override_settings
+from django.db.models import Count, F
+from django.test import TestCase, override_settings
 
 from customers.factories import CustomerFactory
 from orders.factories import OrderFactory, OrderItemFactory

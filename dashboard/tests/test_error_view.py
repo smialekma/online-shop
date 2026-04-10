@@ -1,7 +1,7 @@
 from django.test import TestCase, RequestFactory, override_settings
 
 from customers.factories import CustomerFactory
-from dashboard.views.errors import handler404, handler403, handler500
+from dashboard.views.errors import handler403, handler500
 
 
 @override_settings(DEBUG=False)
