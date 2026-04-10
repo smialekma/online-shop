@@ -4,6 +4,8 @@ from typing import Any
 
 from .env import env
 from django.contrib import messages
+import sys
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,6 +17,7 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS: list[Any] = []
 
+ENVIRONMENT = env("ENVIRONMENT")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -185,9 +188,12 @@ EMAIL_USE_TLS = True
 
 # Stripe payments
 
-STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
-STRIPE_PUBLISHABLE_KEY = env("STRIPE_PUBLISHABLE_KEY")
-STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET")
+if ENVIRONMENT == "production":
+    STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
+    STRIPE_PUBLISHABLE_KEY = env("STRIPE_PUBLISHABLE_KEY")
+    STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET")
+else:
+    STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY", default="sk_test_dummy")
 
 
 # CELERY
@@ -197,3 +203,6 @@ CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://redis:6379
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
+
+if "test" in sys.argv:
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]

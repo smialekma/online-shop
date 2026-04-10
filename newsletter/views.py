@@ -5,7 +5,7 @@ from django.core.mail import EmailMessage
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 from newsletter.forms import NewsletterForm
@@ -53,7 +53,7 @@ def confirm_subscription(
     request: HttpRequest, uidb64: str, token: str
 ) -> HttpResponseRedirect:
     try:
-        uid = urlsafe_base64_decode(uidb64)
+        uid = force_str(urlsafe_base64_decode(uidb64))
         subscriber = Subscriber.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, Subscriber.DoesNotExist):
         subscriber = None

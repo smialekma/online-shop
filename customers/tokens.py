@@ -5,7 +5,7 @@ from customers.models import Customer
 
 
 class TokenGenerator(PasswordResetTokenGenerator):
-    def _make_hash_value(self, user: Customer, timestamp) -> str:
+    def _make_hash_value(self, user: Customer, timestamp: int) -> str:
         return (
             six.text_type(user.pk)
             + six.text_type(timestamp)

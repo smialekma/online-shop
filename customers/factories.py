@@ -1,7 +1,6 @@
 import factory
 
 from .models import Customer
-from customer_addresses.factories import CustomerAddressFactory
 
 
 class CustomerFactory(factory.django.DjangoModelFactory):
@@ -15,6 +14,6 @@ class CustomerFactory(factory.django.DjangoModelFactory):
     is_active = True
     is_staff = False
     is_superuser = False
+    is_manager = False
 
     password = factory.PostGenerationMethodCall("set_password", "defaultpassword")
-    address = factory.SubFactory(CustomerAddressFactory)

@@ -8,6 +8,6 @@ class UserUpdateForm(forms.ModelForm):
         model = Customer
         fields = "__all__"
         widgets = {
-            "date_joined": forms.DateInput(attrs={"type": "datetime-local"}),
+            "date_joined": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "last_login": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }

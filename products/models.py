@@ -1,6 +1,3 @@
-from _pydatetime import datetime
-from decimal import Decimal
-
 from django.db import models
 from PIL import Image
 from django.db.models import Count, Avg
@@ -11,14 +8,14 @@ from orders.models import OrderItem
 
 
 class Brand(models.Model):
-    name: str | models.CharField = models.CharField()
+    name = models.CharField()
 
     def __str__(self) -> str:
         return self.name
 
 
 class Category(models.Model):
-    name: str | models.CharField = models.CharField()
+    name = models.CharField()
     photo = models.ImageField(upload_to="category_pics")  # type: ignore
 
     def save(self, *args: Any, **kwargs: Any) -> None:
@@ -36,27 +33,19 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    name: str | models.CharField = models.CharField(
-        max_length=30, help_text="name of the product"
-    )
-    brand: models.ForeignKey = models.ForeignKey(
-        Brand, related_name="products", on_delete=models.CASCADE
-    )
-    description: str | models.TextField = models.TextField()
-    details: str | models.TextField = models.TextField()
-    price: float | Decimal | models.DecimalField = models.DecimalField(
-        decimal_places=2, max_digits=8
-    )
-    quantity: int | models.IntegerField = models.IntegerField()
-    category: models.ForeignKey = models.ForeignKey(
+    name = models.CharField(max_length=30, help_text="name of the product")
+    brand = models.ForeignKey(Brand, related_name="products", on_delete=models.CASCADE)
+    description = models.TextField()
+    details = models.TextField()
+    price = models.DecimalField(decimal_places=2, max_digits=8)
+    quantity = models.IntegerField()
+    category = models.ForeignKey(
         Category, related_name="products", on_delete=models.CASCADE
     )
-    date_added: datetime | models.DateTimeField = models.DateTimeField(
-        default=timezone.now
-    )
+    date_added = models.DateTimeField(default=timezone.now)
 
-    is_sale: bool | models.BooleanField = models.BooleanField(default=False)
-    old_price: float | Decimal | models.DecimalField = models.DecimalField(
+    is_sale = models.BooleanField(default=False)
+    old_price = models.DecimalField(
         decimal_places=2, max_digits=8, null=True, blank=True
     )
 
@@ -111,8 +100,8 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     photo = models.ImageField(upload_to="product_pics")  # type: ignore
-    is_main_photo: bool | models.BooleanField = models.BooleanField(default=False)
-    product: models.ForeignKey = models.ForeignKey(
+    is_main_photo = models.BooleanField(default=False)
+    product = models.ForeignKey(
         Product, related_name="images", on_delete=models.CASCADE
     )
 

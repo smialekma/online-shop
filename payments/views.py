@@ -17,6 +17,9 @@ def create_checkout_session(
 
     session_url = payment_provider.create_checkout_session()
 
+    if session_url is None:
+        raise Exception("Session url not available.")
+
     return redirect(session_url, code=303)
 
 
