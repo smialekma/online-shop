@@ -1,3 +1,4 @@
+import os
 from unittest.mock import Mock
 
 from django.test import TestCase, tag, override_settings
@@ -76,8 +77,9 @@ class CheckoutViewTests(TestCase):
         self.url = reverse("checkout-view")
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_empty_cart_redirect(self):

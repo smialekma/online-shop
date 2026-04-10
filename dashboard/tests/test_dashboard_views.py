@@ -28,7 +28,7 @@ class BaseTestClass(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        if os.path.exists:
+        if os.path.exists(cls.tmp_dir):
             shutil.rmtree(cls.tmp_dir)
         super().tearDownClass()
 

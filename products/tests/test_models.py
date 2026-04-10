@@ -1,4 +1,3 @@
-import tempfile
 from datetime import timedelta
 from decimal import Decimal
 from django.test import tag, override_settings
@@ -69,9 +68,10 @@ class ProductModelTests(TestCase):
 @tag("y")  # TODO tworzy plik w cateogry_pics
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class ProductImageModelTests(TestCase):
-    @classmethod  # TODO change for if path.os.exists:
+    @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def setUp(self):

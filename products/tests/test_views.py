@@ -3,7 +3,6 @@ from django.test import TestCase, tag, override_settings, RequestFactory
 
 from carts.cart import Cart
 from customers.factories import CustomerFactory
-from product_reviews.factories import ReviewFactory
 from product_reviews.models import Review
 from ..factories import (
     ProductFactory,
@@ -32,8 +31,9 @@ class ProductViewTestCase(TestCase):
         # self.client.login(user)
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_only_get_allowed(self) -> None:
@@ -176,8 +176,9 @@ class ProductDetailViewTests(TestCase):
         cls.url = reverse("detail-view", args=[cls.product.id])
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_product_detail_renders(self):
@@ -260,8 +261,9 @@ class AddToCartTests(TestCase):
         self.url = reverse("product-add")
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_add_product_to_cart(self):
@@ -321,8 +323,9 @@ class RemoveFromCartTests(TestCase):
         self.url = reverse("product-remove")
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_remove_product(self):
@@ -349,8 +352,9 @@ class ProductStockLogicTests(TestCase):
         self.request.session = self.client.session
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_available_quantity(self):

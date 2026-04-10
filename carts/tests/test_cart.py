@@ -5,6 +5,7 @@ from core import settings
 from products.factories import ProductImageFactory, ProductFactory
 import tempfile
 import shutil
+import os
 
 TEMP_MEDIA = tempfile.mkdtemp()
 
@@ -21,8 +22,9 @@ class CartTests(TestCase):
         ProductImageFactory(product=self.product, is_main_photo=True)
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_cart_initialization(self):

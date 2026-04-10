@@ -1,4 +1,3 @@
-from django.test import TestCase
 from ..models import Brand, Category, Product, ProductImage
 from django.test import TestCase, tag, override_settings
 from ..factories import (
@@ -31,9 +30,11 @@ class TestBrandFactory(TestCase):
 @tag("fast")
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class TestCategoryFactory(TestCase):
+
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_single_object_created(self) -> None:
@@ -63,8 +64,9 @@ class TestProductFactory(TestCase):
         self.assertEqual(Product.objects.count(), 5)
 
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
 
@@ -72,8 +74,9 @@ class TestProductFactory(TestCase):
 @override_settings(MEDIA_ROOT=TEMP_MEDIA)
 class TestProductImageFactory(TestCase):
     @classmethod
-    def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+    def tearDownClass(cls):
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_single_object_created(self) -> None:

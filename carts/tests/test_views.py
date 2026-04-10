@@ -1,4 +1,5 @@
 import json
+import os.path
 
 from django.contrib.messages import get_messages
 from django.urls import reverse
@@ -24,7 +25,8 @@ class CartViewTests(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_cart_view_renders(self):
@@ -57,7 +59,8 @@ class CartUpdateTests(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     @tag("fail")
@@ -117,7 +120,8 @@ class RemoveFromCartViewTests(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(TEMP_MEDIA)
+        if os.path.exists(TEMP_MEDIA):
+            shutil.rmtree(TEMP_MEDIA)
         super().tearDownClass()
 
     def test_remove_product_from_cart(self):
