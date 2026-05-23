@@ -15,7 +15,9 @@ SECRET_KEY = env("SECRET_KEY")
 
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS: list[Any] = []
+hosts_string = env("ALLOWED_HOSTS", default=None)
+
+ALLOWED_HOSTS: list[Any] = hosts_string.split(",") if hosts_string else []
 
 ENVIRONMENT = env("ENVIRONMENT")
 
@@ -32,6 +34,7 @@ INSTALLED_APPS = [
     "django_filters",
     "crispy_forms",
     "crispy_bootstrap4",
+    "storages",
 ]
 
 INSTALLED_EXTENSIONS = [
@@ -145,6 +148,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "dashboard/static")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
@@ -206,3 +210,22 @@ CELERY_TIMEZONE = "UTC"
 
 if "test" in sys.argv:
     PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+# S3 - configuration
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "eu-central-1")
+
+# S3 - additional options
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+
+# S3 static files
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+    },
+}

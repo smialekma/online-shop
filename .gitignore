@@ -175,3 +175,7 @@ cython_debug/
 
 media/product_pics/
 media/category_pics/
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
