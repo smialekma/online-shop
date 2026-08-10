@@ -116,7 +116,37 @@ Integrated directly into product detail pages
 * Unit tests: Factory Boy, Coverage
 
 ## Setup
-#To-do
+1. Clone repository
+```bash
+git clone https://github.com/yourusername/online-shop.git
+cd online-shop
+```
+2. Create environment file
+```bash
+cp .env.dist .env
+```
+
+3. Fill in the required environment variables.
+
+4. Run with Docker
+```bash
+docker compose up --build
+```
+5. Or run locally:
+
+- Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+- Apply migrations
+```bash
+python manage.py migrate
+```
+- Run development server
+```bash
+python manage.py runserver
+```
 
 ## App view
 #To-do
