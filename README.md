@@ -3,42 +3,93 @@ A full-stack e-commerce platform built with Django, designed as a portfolio proj
 The application implements the complete customer purchasing flow, from browsing products to placing and paying for orders, while also providing management tools for store administrators.
 
 ## Features
-<details>
-<summary><b>Home page</b> with recommended product rankings</summary>
-  Main storefront interface (Electro template)
-  - New and top-selling products sorted by category
-  - Random, discounted and top-rated products
- - product card with rating and possibility to  add products to cart/wishlist
-  - ability to add products to cart/wishlist
-</details>
-* **Product catalog** with categories, product details, search, server-side filtering and pagination
 
-- filters: category, price, brand
-- product details: related products, reviews and rating
-* Session-based **shopping cart and wishlist**
-- possibility to add products in various places within the store (eg, home page, product details)
-- AJAX-powered cart operations implemented in JavaScript, with asynchronous requests to Django views for updating cart contents without full page reloads
-* **Complete checkout and order flow** with option for non-registered customers
-- populating saved user data
-- shopping methods with dynamic total amount re-calculating using AJAX
-* **Stripe payment integration** with payment processing and webhook handling
-- success and cancel pages, payment email confirmation
-* **Customer accounts** with registration, authentication, profile management, email verification and password recovery
-- custom user model for email-based authentication
-- email verification based on Django password reset tokens
-- customer profile view with shopping statistics, possibility to edit saved address (later pre-filled during checkout) and order history view (filters, order details)
-* **Product reviews and rating**
-  - in product details view
-* **Newsletter subscriptions**
-  - email verification
-* **Asynchronous background tasks** powered by Celery and Redis, with scheduled tasks and Flower monitoring
-* **Store management panel** for admins
-  - dashboard with statistics
-  - list views with search and filters for subscribers, newsletter posts, shipping methods, orders, payments, reviews, products, brands, categories
-  - update views
-- Command for populating db with test data for developers
-- Custom error views
-- custom context processors
+<details>
+<summary><b>Home page</b> with product recommendations and rankings</summary>
+
+* Main storefront interface based on the Electro template
+* New and top-selling products grouped by category
+* Random, discounted and top-rated product sections
+* Product cards displaying ratings and providing quick access to cart and wishlist actions
+
+</details>
+
+<details>
+<summary><b>Product catalog</b> with categories, product details, search, filtering and pagination</summary>
+
+* Server-side filtering by category, brand and price
+* Detailed product pages with related products, customer reviews and rating
+
+</details>
+
+<details>
+<summary>Session-based <b>shopping cart and wishlist</b></summary>
+  
+* Cart available without requiring a user account
+* Adding, removing and updating products from multiple places within the store
+* AJAX-powered cart operations implemented in JavaScript, allowing cart contents and quantities to be updated without full page reloads
+
+</details>
+
+<details>
+<summary><b>Complete checkout and order flow</b></summary>
+
+* Available to both registered and guest customers
+* Automatic pre-filling of saved customer data for authenticated users
+* Multiple shipping methods with AJAX-based dynamic recalculation of the order total
+
+</details>
+
+<details>
+<summary><b>Stripe payment integration</b> with payment processing and webhook handling</summary>
+
+* Dedicated payment success and cancellation flows
+* Email confirmation after successful payment
+
+</details>
+
+<details>
+<summary><b>Customer accounts</b> with registration, authentication, profile management, email verification and password recovery</summary>
+
+* Custom user model with email-based authentication
+* Email address verification based on Django password reset tokens
+* Customer profile with:
+  * shopping statistics
+  * editable saved address
+  * filterable order history and detailed order views
+
+</details>
+
+<details>
+<summary><b>Product reviews and ratings</b></summary>
+
+Integrated directly into product detail pages
+
+</details>
+
+<details>
+<summary><b>Newsletter</b> powered by Celery, Redis and Flower</summary>
+
+* Email verification
+* Asynchronous background tasks powered by Celery and Redis, with scheduled tasks and Flower monitoring
+
+</details>
+
+<details>
+<summary><b>Store management panel</b> for admins</summary>
+
+* Dedicated administration dashboard with store statistics
+* Searchable and filterable management views for viewing and updating model objects
+
+</details>
+
+<details>
+<summary><b>Developer features</b></summary>
+
+* Django management command for populating the database with test data
+* Custom error views and context processors
+
+</details>
 
 ## Technologies & Tools
 ### Backend
