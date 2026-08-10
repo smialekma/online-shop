@@ -116,36 +116,50 @@ Integrated directly into product detail pages
 * Unit tests: Factory Boy, Coverage
 
 ## Setup
-1. Clone repository
+
+1. Clone the repository
+
 ```bash
 git clone https://github.com/yourusername/online-shop.git
 cd online-shop
 ```
-2. Create environment file
+
+2. Create the environment file
+
 ```bash
 cp .env.dist .env
 ```
 
 3. Fill in the required environment variables.
 
-4. Run with Docker
-```bash
-docker compose up --build
-```
-5. Or run locally:
+4. Install dependencies with [Poetry](https://python-poetry.org/):
 
-- Install dependencies
 ```bash
-pip install -r requirements.txt
+poetry install
 ```
 
-- Apply migrations
+5. Activate the Poetry virtual environment:
+
+```bash
+poetry env activate
+```
+
+6. Set up the database - apply migrations:
+
 ```bash
 python manage.py migrate
 ```
-- Run development server
+
+7. Run the development server:
+
 ```bash
 python manage.py runserver
+```
+
+8. Alternatively, run with Docker:
+
+```bash
+docker compose up --build
 ```
 
 ## App view
