@@ -28,6 +28,8 @@ class WishlistView(LoginRequiredMixin, ListView):
 
 
 class AddToWishlistView(LoginRequiredMixin, View):
+    redirect_field_name = None
+
     def post(self, request: HttpRequest) -> HttpResponseRedirect:
         product_id = request.POST.get("product_id")
         product = get_object_or_404(Product, id=product_id)
