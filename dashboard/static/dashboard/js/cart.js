@@ -14,27 +14,26 @@ function getCookie(name) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-            const products = document.querySelectorAll(".product")
+            const cartForms = document.querySelectorAll(".add-to-cart-form");
 
-            products.forEach(product => {
-                product.addEventListener('submit', function(e) {
+            cartForms.forEach(form => {
+                form.addEventListener("submit", function(e) {
                     e.preventDefault();
-                    const form = product.querySelector(".add-to-cart-form")
-                    const formData = new FormData(form);
 
-                    const button = form.querySelector('.add-to-cart-btn');
+                    const formData = new FormData(form);
+                    const button = form.querySelector(".add-to-cart-btn");
 
                     button.disabled = true;
 
-                    fetch("/products/add",
-                        {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                            }
+                    fetch("/products/add", {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
                         }
-                    ).then(response => response.json()).then(data => {
+                    })
+                    .then(response => response.json())
+                    .then(data => {
                             if (data.limited) {
                                 button.innerHTML = 'NO MORE IN STOCK';
 
