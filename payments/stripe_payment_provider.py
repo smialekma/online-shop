@@ -19,13 +19,11 @@ from payments.models import Payment
 
 class StripePaymentProvider:
 
-    def __init__(self, request: HttpRequest, order_id: int | None = None) -> None:
+    def __init__(self, request: HttpRequest, order_id: int) -> None:
         self.order_id = order_id
         self.request = request
 
-        if order_id:
-            order = self._get_order()
-            self.order = order
+        self.order = self._get_order()
 
     def _get_order(self) -> Order:
         order: Order = (
@@ -142,7 +140,9 @@ class StripePaymentProvider:
         session = stripe.checkout.Session.create(
             shipping_options=shipping_option,
             customer_email=(
-                self.request.user.email if self.request.user.is_authenticated else ""
+                self.request.user.email
+                if self.request.user.is_authenticated
+                else self.order.email
             ),
             line_items=line_items,
             mode="payment",
