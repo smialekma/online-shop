@@ -113,7 +113,7 @@ Integrated directly into product detail pages
 * Celery, Flower, Redis
 * Stripe API
 ### Frontend
-* Django Templates (HTML, CCS)
+* Django Templates (HTML, CSS)
 * Crispy Forms
 * Bootstrap
 * JavaScript (AJAX-based shopping cart interactions)
