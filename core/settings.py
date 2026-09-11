@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from typing import Any
 
+import sentry_sdk
+
 from .env import env
 from django.contrib import messages
 import sys
@@ -239,3 +241,16 @@ else:
             "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
         },
     }
+
+# Sentry
+
+sentry_dsn = os.environ.get("SENTRY_DSN", "").strip()
+
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        environment="production",
+        send_default_pii=False,
+        include_local_variables=False,
+        max_request_body_size="never",
+    )

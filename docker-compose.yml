@@ -11,6 +11,8 @@ services:
       - "8000:8000"
     depends_on:
       - db
+    environment:
+      - SENTRY_DSN=${SENTRY_DSN:-}
   db:
     container_name: online-shop-db
     image: postgres:17.5
@@ -53,6 +55,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - PYTHONPATH=/app
+      - SENTRY_DSN=${SENTRY_DSN:-}
   celery-beat:
     container_name: shop-celery-beat
     build:
@@ -68,6 +71,7 @@ services:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - PYTHONPATH=/app
+      - SENTRY_DSN=${SENTRY_DSN:-}
   flower:
     container_name: shop-flower
     build:
