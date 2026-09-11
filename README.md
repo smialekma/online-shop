@@ -134,7 +134,7 @@ Integrated directly into product detail pages
 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/online-shop.git
+git clone https://github.com/smialekma/online-shop.git
 cd online-shop
 ```
 
