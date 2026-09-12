@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Any
 
 import sentry_sdk
 
@@ -17,9 +16,7 @@ SECRET_KEY = env("SECRET_KEY")
 
 DEBUG = env("DEBUG")
 
-hosts_string = env("ALLOWED_HOSTS", default=None)
-
-ALLOWED_HOSTS: list[Any] = hosts_string.split(",") if hosts_string else []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 ENVIRONMENT = env("ENVIRONMENT")
 
