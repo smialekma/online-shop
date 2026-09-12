@@ -241,8 +241,8 @@ else:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-# Sentry
 
+# sentry
 sentry_dsn = os.environ.get("SENTRY_DSN", "").strip()
 
 if sentry_dsn:
